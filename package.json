@@ -1,0 +1,26 @@
+{
+    "name": "ringo-sqlstore",
+    "version": "0.1",
+    "description": "Django templates for JavaScript",
+    "keywords": ["template"],
+    "maintainers": [{
+            "name": "Simon Oberhammer",
+            "web": "http://nekapuzer.at/",
+            "email": "simon@nekapuzer.at"
+        }],
+    "contributors": [],
+    "dependencies": {
+    },
+    "licenses": [{
+        "type": "Apache License Version 2.0",
+        "url": "http://www.apache.org/licenses/"
+    }],
+    "repositories": [{
+        "type": "git",
+        "url": "https://github.com/grob/ringo-sqlstore.git"
+    }],
+    "engines": {
+        "ringojs": ">= 0.8"
+    },
+    "main": "./lib/template.js"
+}

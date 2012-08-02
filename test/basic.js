@@ -118,15 +118,44 @@ exports.testBasic = function() {
             //Numbers are numbers even if their digits are in the context.
             'basic-syntax35': ["{{ 1 }}", {"1": "abc"}, "1"],
             'basic-syntax36': ["{{ 1.2 }}", {"1": "abc"}, "1.2"],
+
+            //FOR TAG
+            'for-tag01': ["{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"],
+            'for-tag02': ["{% for val in values reversed %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "321"],
+            'for-tag-vars01': ["{% for val in values %}{{ forloop.counter }}{% endfor %}", {"values": [6, 6, 6]}, "123"],
+            'for-tag-vars02': ["{% for val in values %}{{ forloop.counter0 }}{% endfor %}", {"values": [6, 6, 6]}, "012"],
+            'for-tag-vars03': ["{% for val in values %}{{ forloop.revcounter }}{% endfor %}", {"values": [6, 6, 6]}, "321"],
+            'for-tag-vars04': ["{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}", {"values": [6, 6, 6]}, "210"],
+            // FIXME NEED IFTAG 'for-tag-vars05': ["{% for val in values %}{% if forloop.first %}f{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "fxx"],
+            // FIXME NEED IFTAG 'for-tag-vars06': ["{% for val in values %}{% if forloop.last %}l{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "xxl"],
+            'for-tag-unpack01': ["{% for key,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
+            'for-tag-unpack03': ["{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
+            'for-tag-unpack04': ["{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
+            'for-tag-unpack05': ["{% for key ,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
+            'for-tag-unpack06': ["{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, Error],
+            'for-tag-unpack07': ["{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, Error],
+            'for-tag-unpack08': ["{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, Error],
+            //Ensure that a single loopvar doesn't truncate the list in val.
+            'for-tag-unpack09': ["{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
+            //Otherwise, silently truncate if the length of loopvars differs to the length of each set of items.
+            'for-tag-unpack10': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2, 'orange']]}, "one:1/two:2/"],
+            'for-tag-unpack11': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1,INVALID/two:2,INVALID/"],
+            'for-tag-unpack12': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2]]}, "one:1,carrot/two:2,INVALID/"],
+            'for-tag-unpack13': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2, 'cheese']]}, "one:1,carrot/two:2,cheese/"],
+            'for-tag-unpack14': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [1, 2]}, "INVALID:INVALID/INVALID:INVALID/"],
+            'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
+            'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
+            'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
       };
 
       for (var key in tests) {
             var test = tests[key];
+            print (key)
             if (test[2] == Error) {
                   assert.throws(function() { new Template(test[0]); }, test[2], key)
             } else {
                   var template = new Template(test[0]);
-                  assert.strictEqual(template.render(test[1]), test[2], key);
+                  assert.strictEqual(template.render(new Context(test[1])), test[2], key);
             }
       }
 
@@ -331,34 +360,6 @@ if (require.main == module.id) {
             'firstof08': ['{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'],
             'firstof09': ['{% firstof %}', {}, Error],
             'firstof10': ['{% firstof a %}', {'a': '<'}, '<'], //Variables are NOT auto-escaped.
-
-            //FOR TAG ###############################################################
-            'for-tag01': ["{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"],
-            'for-tag02': ["{% for val in values reversed %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "321"],
-            'for-tag-vars01': ["{% for val in values %}{{ forloop.counter }}{% endfor %}", {"values": [6, 6, 6]}, "123"],
-            'for-tag-vars02': ["{% for val in values %}{{ forloop.counter0 }}{% endfor %}", {"values": [6, 6, 6]}, "012"],
-            'for-tag-vars03': ["{% for val in values %}{{ forloop.revcounter }}{% endfor %}", {"values": [6, 6, 6]}, "321"],
-            'for-tag-vars04': ["{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}", {"values": [6, 6, 6]}, "210"],
-            'for-tag-vars05': ["{% for val in values %}{% if forloop.first %}f{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "fxx"],
-            'for-tag-vars06': ["{% for val in values %}{% if forloop.last %}l{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "xxl"],
-            'for-tag-unpack01': ["{% for key,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, "one:1/two:2/"],
-            'for-tag-unpack03': ["{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, "one:1/two:2/"],
-            'for-tag-unpack04': ["{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, "one:1/two:2/"],
-            'for-tag-unpack05': ["{% for key ,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, "one:1/two:2/"],
-            'for-tag-unpack06': ["{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, Error],
-            'for-tag-unpack07': ["{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, Error],
-            'for-tag-unpack08': ["{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, Error],
-            //Ensure that a single loopvar doesn't truncate the list in val.
-            'for-tag-unpack09': ["{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, "one:1/two:2/"],
-            //Otherwise, silently truncate if the length of loopvars differs to the length of each set of items.
-            'for-tag-unpack10': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [('one', 1, 'carrot'], ('two', 2, 'orange'))}, "one:1/two:2/"],
-            'for-tag-unpack11': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [('one', 1], ('two', 2))}, ("one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/")],
-            'for-tag-unpack12': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [('one', 1, 'carrot'], ('two', 2))}, ("one:1,carrot/two:2,/", "one:1,carrot/two:2,INVALID/")],
-            'for-tag-unpack13': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [('one', 1, 'carrot'], ('two', 2, 'cheese'))}, ("one:1,carrot/two:2,cheese/", "one:1,carrot/two:2,cheese/")],
-            'for-tag-unpack14': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [1, 2)}, (":/:/", "INVALID:INVALID/INVALID:INVALID/")],
-            'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
-            'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
-            'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
 
             //IF TAG ################################################################
             'if-tag01': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"],

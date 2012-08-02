@@ -1,0 +1,15 @@
+<html>
+<body>
+
+{% extends "base.html" %}
+
+{% block title %}Future time{% endblock %}
+
+{{author.name|upper}}
+
+{% block content %}
+<p>In {{ hour_offset|dateFormat:"yyyy" }} hour(s), it will be {{ next_time }}.</p>
+{% endblock %}
+
+</body>
+<html>

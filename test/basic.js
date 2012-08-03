@@ -25,8 +25,21 @@ var SomeClass = function() {
       return this;
 }
 
-
 exports.testBasic = function() {
+
+      // register fake template loader for `include` testing later on
+      var TestTemplateLoader = function() {
+            this.loadTemplateSource = function(templateName) {
+                  if (tests[templateName]) {
+                        return tests[templateName][0];
+                  }
+                  return null;
+            }
+            return this;
+      }
+      require('../lib/loader').register(new TestTemplateLoader());
+
+      // 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
       var tests = {
             //BASIC SYNTAX ################################################
 
@@ -119,7 +132,7 @@ exports.testBasic = function() {
             'basic-syntax35': ["{{ 1 }}", {"1": "abc"}, "1"],
             'basic-syntax36': ["{{ 1.2 }}", {"1": "abc"}, "1.2"],
 
-            //FOR TAG
+            //FOR TAG ###########################################################
             'for-tag01': ["{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag02': ["{% for val in values reversed %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "321"],
             'for-tag-vars01': ["{% for val in values %}{{ forloop.counter }}{% endfor %}", {"values": [6, 6, 6]}, "123"],
@@ -146,6 +159,8 @@ exports.testBasic = function() {
             'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
             'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
+
+            //FILTERS ###########################################################
 
             //Basic filter usage
             'filter-syntax01': ["{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
@@ -228,13 +243,50 @@ exports.testBasic = function() {
             'filter-syntax21': ['1{{ var.silent_fail_key }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
             'filter-syntax22': ['1{{ var.silent_fail_attribute }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
 
+            //INCLUDE TAG ###########################################################
+            'include01': ['{% include "basic-syntax01" %}', {}, "something cool"],
+            'include02': ['{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"],
+            'include03': ['{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"],
+            'include04': ['a{% include "nonexistent" %}b', {}, Error],
+            'include 05': ['template with a space', {}, 'template with a space'],
+            'include06': ['{% include "include 05"%}', {}, 'template with a space'],
+
+            //extra inline context
+            'include07': ['{% include "basic-syntax02" with headline="Inline" %}', {'headline': 'Included'}, 'Inline'],
+            'include08': ['{% include headline with headline="Dynamic" %}', {'headline': 'basic-syntax02'}, 'Dynamic'],
+            'include09': ['{{ first }}--{% include "basic-syntax03" with first=second|lower|upper second=first|upper %}--{{ second }}', {'first': 'Ul', 'second': 'lU'}, 'Ul--LU --- UL--lU'],
+
+            //isolated context
+            'include10': ['{% include "basic-syntax03" only %}', {'first': '1'}, 'INVALID --- INVALID'],
+            'include11': ['{% include "basic-syntax03" only with second=2 %}', {'first': '1'}, 'INVALID --- 2'],
+            'include12': ['{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, '1 --- INVALID'],
+
+            //autoescape context
+            // FIXME implement autoescape tag
+            // 'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, ('& --- ', '& --- INVALID')],
+            // 'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, ('& --- ', '& --- INVALID')],
+
+            'include-error01': ['{% include "basic-syntax01" with %}', {}, Error],
+            'include-error02': ['{% include "basic-syntax01" with "no key" %}', {}, Error],
+            'include-error03': ['{% include "basic-syntax01" with dotted.arg="error" %}', {}, Error],
+            'include-error04': ['{% include "basic-syntax01" something_random %}', {}, Error],
+            'include-error05': ['{% include "basic-syntax01" foo="duplicate" foo="key" %}', {}, Error],
+            'include-error06': ['{% include "basic-syntax01" only only %}', {}, Error],
+
+
       };
 
       for (var key in tests) {
             var test = tests[key];
-            print (key)
+            print (key);
             if (test[2] == Error) {
-                  assert.throws(function() { new Template(test[0]); }, test[2], key)
+                  assert.throws(function() {
+                              var t = new Template(test[0]);
+                              t.render(new Context(test[1]));
+                        },
+                        test[2],
+                        key
+                  );
             } else {
                   var template = new Template(test[0]);
                   assert.strictEqual(template.render(new Context(test[1])), test[2], key);
@@ -592,34 +644,6 @@ if (require.main == module.id) {
             'ifnotequal03': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"],
             'ifnotequal04': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"],
 
-            //INCLUDE TAG ###########################################################
-            'include01': ['{% include "basic-syntax01" %}', {}, "something cool"],
-            'include02': ['{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"],
-            'include03': ['{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"],
-            'include04': ['a{% include "nonexistent" %}b', {}, ("ab", "ab", template.TemplateDoesNotExist)],
-            'include 05': ['template with a space', {}, 'template with a space'],
-            'include06': ['{% include "include 05"%}', {}, 'template with a space'],
-
-            //extra inline context
-            'include07': ['{% include "basic-syntax02" with headline="Inline" %}', {'headline': 'Included'}, 'Inline'],
-            'include08': ['{% include headline with headline="Dynamic" %}', {'headline': 'basic-syntax02'}, 'Dynamic'],
-            'include09': ['{{ first }}--{% include "basic-syntax03" with first=second|lower|upper second=first|upper %}--{{ second }}', {'first': 'Ul', 'second': 'lU'}, 'Ul--LU --- UL--lU'],
-
-            //isolated context
-            'include10': ['{% include "basic-syntax03" only %}', {'first': '1'}, (' --- ', 'INVALID --- INVALID')],
-            'include11': ['{% include "basic-syntax03" only with second=2 %}', {'first': '1'}, (' --- 2', 'INVALID --- 2')],
-            'include12': ['{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, ('1 --- ', '1 --- INVALID')],
-
-            //autoescape context
-            'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, ('& --- ', '& --- INVALID')],
-            'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, ('& --- ', '& --- INVALID')],
-
-            'include-error01': ['{% include "basic-syntax01" with %}', {}, Error],
-            'include-error02': ['{% include "basic-syntax01" with "no key" %}', {}, Error],
-            'include-error03': ['{% include "basic-syntax01" with dotted.arg="error" %}', {}, Error],
-            'include-error04': ['{% include "basic-syntax01" something_random %}', {}, Error],
-            'include-error05': ['{% include "basic-syntax01" foo="duplicate" foo="key" %}', {}, Error],
-            'include-error06': ['{% include "basic-syntax01" only only %}', {}, Error],
 
             //INCLUSION ERROR REPORTING #############################################
             'include-fail1': ['{% load bad_tag %}{% badtag %}', {}, RuntimeError],

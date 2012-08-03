@@ -274,6 +274,62 @@ exports.testBasic = function() {
             'include-error06': ['{% include "basic-syntax01" only only %}', {}, Error],
 
 
+            //IFEQUAL TAG ###########################################################
+            'ifequal01': ["{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""],
+            'ifequal02': ["{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 1}, "yes"],
+            'ifequal03': ["{% ifequal a b %}yes{% else %}no{% endifequal %}", {"a": 1, "b": 2}, "no"],
+            'ifequal04': ["{% ifequal a b %}yes{% else %}no{% endifequal %}", {"a": 1, "b": 1}, "yes"],
+            'ifequal05': ["{% ifequal a 'test' %}yes{% else %}no{% endifequal %}", {"a": "test"}, "yes"],
+            'ifequal06': ["{% ifequal a 'test' %}yes{% else %}no{% endifequal %}", {"a": "no"}, "no"],
+            'ifequal07': ['{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {"a": "test"}, "yes"],
+            'ifequal08': ['{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {"a": "no"}, "no"],
+            'ifequal09': ['{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {}, "no"],
+            'ifequal10': ['{% ifequal a b %}yes{% else %}no{% endifequal %}', {}, "yes"],
+
+            //SMART SPLITTING
+            'ifequal-split01': ['{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {}, "no"],
+            'ifequal-split02': ['{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {'a': 'foo'}, "no"],
+            'ifequal-split03': ['{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {'a': 'test man'}, "yes"],
+            'ifequal-split04': ["{% ifequal a 'test man' %}yes{% else %}no{% endifequal %}", {'a': 'test man'}, "yes"],
+            'ifequal-split05': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': ''}, "no"],
+            'ifequal-split06': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i "love" you'}, "yes"],
+            'ifequal-split07': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i love you'}, "no"],
+            // FIXME probably regex broken for those weird cases
+            // 'ifequal-split08': ["{% ifequal a 'I\'m happy' %}yes{% else %}no{% endifequal %}", {'a': "I'm happy"}, "yes"],
+            //'ifequal-split09': ["{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': "slash\man"}, "yes"],
+            //'ifequal-split10': ["{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': "slashman"}, "no"],
+
+            //NUMERIC RESOLUTION
+            'ifequal-numeric01': ['{% ifequal x 5 %}yes{% endifequal %}', {'x': '5'}, ''],
+            'ifequal-numeric02': ['{% ifequal x 5 %}yes{% endifequal %}', {'x': 5}, 'yes'],
+            'ifequal-numeric03': ['{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5}, ''],
+            'ifequal-numeric04': ['{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5.2}, 'yes'],
+            'ifequal-numeric05': ['{% ifequal x 0.2 %}yes{% endifequal %}', {'x': .2}, 'yes'],
+            // FIXME regex is broken for constants starting with a dot
+            // 'ifequal-numeric06': ['{% ifequal x .2 %}yes{% endifequal %}', {'x': .2}, 'yes'],
+            // WONTFIX? in js `2. === 2`
+            // 'ifequal-numeric07': ['{% ifequal x 2. %}yes{% endifequal %}', {'x': 2}, ''],
+            'ifequal-numeric08': ['{% ifequal x "5" %}yes{% endifequal %}', {'x': 5}, ''],
+            'ifequal-numeric09': ['{% ifequal x "5" %}yes{% endifequal %}', {'x': '5'}, 'yes'],
+            // FIXME regex does not work for - or + at start
+            //'ifequal-numeric10': ['{% ifequal x -5 %}yes{% endifequal %}', {'x': -5}, 'yes'],
+            //'ifequal-numeric11': ['{% ifequal x -5.2 %}yes{% endifequal %}', {'x': -5.2}, 'yes'],
+            //'ifequal-numeric12': ['{% ifequal x +5 %}yes{% endifequal %}', {'x': 5}, 'yes'],
+
+            //FILTER EXPRESSIONS AS ARGUMENTS
+            'ifequal-filter01': ['{% ifequal a|upper "A" %}x{% endifequal %}', {'a': 'a'}, 'x'],
+            'ifequal-filter02': ['{% ifequal "A" a|upper %}x{% endifequal %}', {'a': 'a'}, 'x'],
+            'ifequal-filter03': ['{% ifequal a|upper b|upper %}x{% endifequal %}', {'a': 'x', 'b': 'X'}, 'x'],
+            // NOTE: slice behaves very different compared to django but identical to js Array.slice
+            'ifequal-filter04': ['{% ifequal x|slice:"1:2" "a" %}x{% endifequal %}', {'x': 'aaa'}, 'x'],
+            'ifequal-filter05': ['{% ifequal x|slice:"1:2"|upper "A" %}x{% endifequal %}', {'x': 'aaa'}, 'x'],
+
+            //IFNOTEQUAL TAG ########################################################
+            'ifnotequal01': ["{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"],
+            'ifnotequal02': ["{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 1}, ""],
+            'ifnotequal03': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"],
+            'ifnotequal04': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"],
+
       };
 
       for (var key in tests) {
@@ -592,57 +648,6 @@ if (require.main == module.id) {
             'ifchanged-else03': ['{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'],
 
             'ifchanged-else04': ['{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'],
-
-            //IFEQUAL TAG ###########################################################
-            'ifequal01': ["{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""],
-            'ifequal02': ["{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 1}, "yes"],
-            'ifequal03': ["{% ifequal a b %}yes{% else %}no{% endifequal %}", {"a": 1, "b": 2}, "no"],
-            'ifequal04': ["{% ifequal a b %}yes{% else %}no{% endifequal %}", {"a": 1, "b": 1}, "yes"],
-            'ifequal05': ["{% ifequal a 'test' %}yes{% else %}no{% endifequal %}", {"a": "test"}, "yes"],
-            'ifequal06': ["{% ifequal a 'test' %}yes{% else %}no{% endifequal %}", {"a": "no"}, "no"],
-            'ifequal07': ['{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {"a": "test"}, "yes"],
-            'ifequal08': ['{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {"a": "no"}, "no"],
-            'ifequal09': ['{% ifequal a "test" %}yes{% else %}no{% endifequal %}', {}, "no"],
-            'ifequal10': ['{% ifequal a b %}yes{% else %}no{% endifequal %}', {}, "yes"],
-
-            //SMART SPLITTING
-            'ifequal-split01': ['{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {}, "no"],
-            'ifequal-split02': ['{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {'a': 'foo'}, "no"],
-            'ifequal-split03': ['{% ifequal a "test man" %}yes{% else %}no{% endifequal %}', {'a': 'test man'}, "yes"],
-            'ifequal-split04': ["{% ifequal a 'test man' %}yes{% else %}no{% endifequal %}", {'a': 'test man'}, "yes"],
-            'ifequal-split05': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': ''}, "no"],
-            'ifequal-split06': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i "love" you'}, "yes"],
-            'ifequal-split07': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i love you'}, "no"],
-            'ifequal-split08': [r"{% ifequal a 'I\'m happy' %}yes{% else %}no{% endifequal %}", {'a': "I'm happy"}, "yes"],
-            'ifequal-split09': [r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slash\man"}, "yes"],
-            'ifequal-split10': [r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slashman"}, "no"],
-
-            //NUMERIC RESOLUTION
-            'ifequal-numeric01': ['{% ifequal x 5 %}yes{% endifequal %}', {'x': '5'}, ''],
-            'ifequal-numeric02': ['{% ifequal x 5 %}yes{% endifequal %}', {'x': 5}, 'yes'],
-            'ifequal-numeric03': ['{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5}, ''],
-            'ifequal-numeric04': ['{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5.2}, 'yes'],
-            'ifequal-numeric05': ['{% ifequal x 0.2 %}yes{% endifequal %}', {'x': .2}, 'yes'],
-            'ifequal-numeric06': ['{% ifequal x .2 %}yes{% endifequal %}', {'x': .2}, 'yes'],
-            'ifequal-numeric07': ['{% ifequal x 2. %}yes{% endifequal %}', {'x': 2}, ''],
-            'ifequal-numeric08': ['{% ifequal x "5" %}yes{% endifequal %}', {'x': 5}, ''],
-            'ifequal-numeric09': ['{% ifequal x "5" %}yes{% endifequal %}', {'x': '5'}, 'yes'],
-            'ifequal-numeric10': ['{% ifequal x -5 %}yes{% endifequal %}', {'x': -5}, 'yes'],
-            'ifequal-numeric11': ['{% ifequal x -5.2 %}yes{% endifequal %}', {'x': -5.2}, 'yes'],
-            'ifequal-numeric12': ['{% ifequal x +5 %}yes{% endifequal %}', {'x': 5}, 'yes'],
-
-            //FILTER EXPRESSIONS AS ARGUMENTS
-            'ifequal-filter01': ['{% ifequal a|upper "A" %}x{% endifequal %}', {'a': 'a'}, 'x'],
-            'ifequal-filter02': ['{% ifequal "A" a|upper %}x{% endifequal %}', {'a': 'a'}, 'x'],
-            'ifequal-filter03': ['{% ifequal a|upper b|upper %}x{% endifequal %}', {'a': 'x', 'b': 'X'}, 'x'],
-            'ifequal-filter04': ['{% ifequal x|slice:"1" "a" %}x{% endifequal %}', {'x': 'aaa'}, 'x'],
-            'ifequal-filter05': ['{% ifequal x|slice:"1"|upper "A" %}x{% endifequal %}', {'x': 'aaa'}, 'x'],
-
-            //IFNOTEQUAL TAG ########################################################
-            'ifnotequal01': ["{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"],
-            'ifnotequal02': ["{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 1}, ""],
-            'ifnotequal03': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"],
-            'ifnotequal04': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"],
 
 
             //INCLUSION ERROR REPORTING #############################################

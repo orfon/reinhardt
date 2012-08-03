@@ -146,6 +146,88 @@ exports.testBasic = function() {
             'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
             'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
+
+            //Basic filter usage
+            'filter-syntax01': ["{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
+
+            //Chained filters
+            'filter-syntax02': ["{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"],
+
+            //Allow spaces before the filter pipe
+            'filter-syntax03': ["{{ var |upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
+
+            //Allow spaces after the filter pipe
+            'filter-syntax04': ["{{ var| upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
+
+            //Raise TemplateSyntaxError for a nonexistent filter
+            'filter-syntax05': ["{{ var|does_not_exist }}", {}, Error],
+
+            //Raise TemplateSyntaxError when trying to access a filter containing an illegal character
+            'filter-syntax06': ["{{ var|fil(ter) }}", {}, Error],
+
+            //Raise TemplateSyntaxError for invalid block tags
+            'filter-syntax07': ["{% nothing_to_see_here %}", {}, Error],
+
+            //Raise TemplateSyntaxError for empty block tags
+            'filter-syntax08': ["{% %}", {}, Error],
+
+            //Chained filters, with an argument to the first one
+            // FIXME missing removetags
+            // 'filter-syntax09': ['{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"],
+
+            //Literal string as argument is always "safe" from auto-escaping..
+            // FIXME fix regex
+            // 'filter-syntax10': ['{{ var|defaultifnull:" endquote\" hah" }}',
+            //        {"var": null}, ' endquote" hah'],
+
+            //Variable as argument
+            'filter-syntax11': ['{{ var|defaultifnull:var2 }}', {"var": null, "var2": "happy"}, 'happy'],
+
+            //Default argument testing
+            'filter-syntax12': ['{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": true}, 'yup yes'],
+
+            //Fail silently for methods that raise an exception with a
+            //"silent_variable_failure" attribute
+            // FIXME
+            // 'filter-syntax13': ['1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
+
+            //In methods that raise an exception without a
+            //"silent_variable_attribute" set to True, the exception propagates
+            // FIXME
+            // 'filter-syntax14': ['1{{ var.method4 }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
+
+            //Escaped backslash in argument
+            // FIXME i don't understand - why should it return 'foo\ba'?
+            // filter-syntax15': ['{{ var|defaultifnull:"foo\bar" }}', {"var": null}, 'foo\ba'],
+
+            //Escaped backslash using known escape char
+            // FIXME regex doesn't work for this case
+            // filter-syntax16': ['{{ var|defaultifnull:"foo\now" }}', {"var": null}, 'foo\now'],
+
+            //Empty strings can be passed as arguments to filters
+            // FIXME we always return 'INVALID'
+            // filter-syntax17': ['{{ var|join:"" }}', {'va': ['a', 'b', 'c']}, 'abc'],
+
+            //Make sure that any unicode strings are converted to bytestrings
+            //in the final output.
+            // FIXME
+            // 'filter-syntax18': ['{{ var }}', {'va': UTF8Class()}, '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'],
+
+            //Numbers as filter arguments should work
+            // FIXME truncatewords filter
+            // 'filter-syntax19': ['{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."],
+
+            //filters should accept empty string constants
+            // FIXME it does but the regex doesn't work for ""
+            // filter-syntax20': ['{{ ""|defaultifnull:"was none" }}', {}, ""],
+
+            'filter-syntax20a': ['{{ emptystring|defaultifnull:"was none" }}', {emptystring: ""}, ""],
+
+            //Fail silently for non-callable attribute and dict lookups which
+            //raise an exception with a "silent_variable_failure" attribute
+            'filter-syntax21': ['1{{ var.silent_fail_key }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
+            'filter-syntax22': ['1{{ var.silent_fail_attribute }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
+
       };
 
       for (var key in tests) {
@@ -201,75 +283,6 @@ if (require.main == module.id) {
 
             //Dictionary lookup wins out when there is a string and int version of the key.
             'list-index07': ["{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"],
-
-            //Basic filter usage
-            'filter-syntax01': ["{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
-
-            //Chained filters
-            'filter-syntax02': ["{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"],
-
-            //Allow spaces before the filter pipe
-            'filter-syntax03': ["{{ var |upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
-
-            //Allow spaces after the filter pipe
-            'filter-syntax04': ["{{ var| upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
-
-            //Raise TemplateSyntaxError for a nonexistent filter
-            'filter-syntax05': ["{{ var|does_not_exist }}", {}, Error],
-
-            //Raise TemplateSyntaxError when trying to access a filter containing an illegal character
-            'filter-syntax06': ["{{ var|fil(ter) }}", {}, Error],
-
-            //Raise TemplateSyntaxError for invalid block tags
-            'filter-syntax07': ["{% nothing_to_see_here %}", {}, Error],
-
-            //Raise TemplateSyntaxError for empty block tags
-            'filter-syntax08': ["{% %}", {}, Error],
-
-            //Chained filters, with an argument to the first one
-            'filter-syntax09': ['{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"],
-
-            //Literal string as argument is always "safe" from auto-escaping..
-            'filter-syntax10': ['{{ var|default_if_none:" endquote\" hah" }}',
-                    {"var": None}, ' endquote" hah'],
-
-            //Variable as argument
-            'filter-syntax11': ['{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'],
-
-            //Default argument testing
-            'filter-syntax12': ['{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'],
-
-            //Fail silently for methods that raise an exception with a
-            //"silent_variable_failure" attribute
-            'filter-syntax13': ['1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
-
-            //In methods that raise an exception without a
-            //"silent_variable_attribute" set to True, the exception propagates
-            'filter-syntax14': ['1{{ var.method4 }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
-
-            //Escaped backslash in argument
-            'filter-syntax15': ['{{ var|default_if_none:"foo\bar" }}', {"var": None}, 'foo\ba'],
-
-            //Escaped backslash using known escape char
-            'filter-syntax16': ['{{ var|default_if_none:"foo\now" }}', {"var": None}, 'foo\now'],
-
-            //Empty strings can be passed as arguments to filters
-            'filter-syntax17': ['{{ var|join:"" }}', {'va': ['a', 'b', 'c']}, 'abc'],
-
-            //Make sure that any unicode strings are converted to bytestrings
-            //in the final output.
-            'filter-syntax18': ['{{ var }}', {'va': UTF8Class()}, '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'],
-
-            //Numbers as filter arguments should work
-            'filter-syntax19': ['{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."],
-
-            //filters should accept empty string constants
-            'filter-syntax20': ['{{ ""|default_if_none:"was none" }}', {}, ""],
-
-            //Fail silently for non-callable attribute and dict lookups which
-            //raise an exception with a "silent_variable_failure" attribute
-            'filter-syntax21': ['1{{ var.silent_fail_key }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
-            'filter-syntax22': ['1{{ var.silent_fail_attribute }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
 
             //In attribute and dict lookups that raise an unexpected exception
             //without a "silent_variable_attribute" set to True, the exception
@@ -488,10 +501,10 @@ if (require.main == module.id) {
             'if-tag-shortcircuit02': ['{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"],
 
             //Non-existent args
-            'if-tag-badarg01':("{% if x|default_if_none:y %}yes{% endif %}", {}, ''],
-            'if-tag-badarg02':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 0}, ''],
-            'if-tag-badarg03':("{% if x|default_if_none:y %}yes{% endif %}", {'y': 1}, 'yes'],
-            'if-tag-badarg04':("{% if x|default_if_none:y %}yes{% else %}no{% endif %}", {}, 'no'],
+            'if-tag-badarg01':("{% if x|defaultifnull:y %}yes{% endif %}", {}, ''],
+            'if-tag-badarg02':("{% if x|defaultifnull:y %}yes{% endif %}", {'y': 0}, ''],
+            'if-tag-badarg03':("{% if x|defaultifnull:y %}yes{% endif %}", {'y': 1}, 'yes'],
+            'if-tag-badarg04':("{% if x|defaultifnull:y %}yes{% else %}no{% endif %}", {}, 'no'],
 
             //Additional, more precise parsing tests are in SmartIfTests
 

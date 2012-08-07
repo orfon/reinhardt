@@ -3,6 +3,10 @@ var assert = require("assert");
 var {Template} = require('../lib/template');
 var {Context} = require('../lib/context');
 
+/**
+ * Utility classes
+ */
+
 var OtherClass = function() {
       this.method = function() {
             return "OtherClass.method";
@@ -22,6 +26,19 @@ var SomeClass = function() {
             throw new Error('some');
       }
       this.otherclass = new OtherClass();
+      return this;
+}
+
+var TestObj = function() {
+      this.is_true = function() {
+            return true;
+      }
+      this.is_false = function() {
+            return false;
+      }
+      this.is_bad = function() {
+            throw new Error();
+      }
       return this;
 }
 
@@ -265,7 +282,7 @@ exports.testBasic = function() {
             // 'filter-syntax13': ['1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
 
             //In methods that raise an exception without a
-            //"silent_variable_attribute" set to True, the exception propagates
+            //"silent_variable_attribute" set to true, the exception propagates
             // FIXME
             // 'filter-syntax14': ['1{{ var.method4 }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
 
@@ -524,6 +541,139 @@ exports.testBasic = function() {
             // FIXME regex problem
             // 'inheritance42': ["{% extends 'inheritance02'|cut:' ' %}", {}, '1234'],
 
+
+            //IF TAG ################################################################
+            'if-tag01': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": true}, "yes"],
+            'if-tag02': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": false}, "no"],
+            'if-tag03': ["{% if foo %}yes{% else %}no{% endif %}", {}, "no"],
+
+            'if-tag04': ["{% if foo %}foo{% elif bar %}bar{% endif %}", {'foo': true}, "foo"],
+            'if-tag05': ["{% if foo %}foo{% elif bar %}bar{% endif %}", {'bar': true}, "bar"],
+            'if-tag06': ["{% if foo %}foo{% elif bar %}bar{% endif %}", {}, ""],
+            'if-tag07': ["{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {'foo': true}, "foo"],
+            'if-tag08': ["{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {'bar': true}, "bar"],
+            'if-tag09': ["{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {}, "nothing"],
+            'if-tag10': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'foo': true}, "foo"],
+            'if-tag11': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'bar': true}, "bar"],
+            'if-tag12': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'baz': true}, "baz"],
+            'if-tag13': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {}, "nothing"],
+
+            //Filters
+            'if-tag-filter01': ["{% if foo|length == 5 %}yes{% else %}no{% endif %}", {'foo': 'abcde'}, "yes"],
+            'if-tag-filter02': ["{% if foo|upper == 'ABC' %}yes{% else %}no{% endif %}", {}, "no"],
+
+            //Equality
+            'if-tag-eq01': ["{% if foo == bar %}yes{% else %}no{% endif %}", {}, "yes"],
+            'if-tag-eq02': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1}, "no"],
+            'if-tag-eq03': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'bar': 1}, "yes"],
+            'if-tag-eq04': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'bar': 2}, "no"],
+            // FIXME regex problem
+            // 'if-tag-eq05': ["{% if foo == '' %}yes{% else %}no{% endif %}", {}, "no"],
+
+            //Comparison
+            'if-tag-gt-01': ["{% if 2 > 1 %}yes{% else %}no{% endif %}", {}, "yes"],
+            'if-tag-gt-02': ["{% if 1 > 1 %}yes{% else %}no{% endif %}", {}, "no"],
+            'if-tag-gte-01': ["{% if 1 >= 1 %}yes{% else %}no{% endif %}", {}, "yes"],
+            'if-tag-gte-02': ["{% if 1 >= 2 %}yes{% else %}no{% endif %}", {}, "no"],
+            'if-tag-lt-01': ["{% if 1 < 2 %}yes{% else %}no{% endif %}", {}, "yes"],
+            'if-tag-lt-02': ["{% if 1 < 1 %}yes{% else %}no{% endif %}", {}, "no"],
+            'if-tag-lte-01': ["{% if 1 <= 1 %}yes{% else %}no{% endif %}", {}, "yes"],
+            'if-tag-lte-02': ["{% if 2 <= 1 %}yes{% else %}no{% endif %}", {}, "no"],
+
+            //Contains
+            'if-tag-in-01': ["{% if 1 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"],
+            'if-tag-in-02': ["{% if 2 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"],
+            'if-tag-not-in-01': ["{% if 1 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"],
+            'if-tag-not-in-02': ["{% if 2 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"],
+
+            //AND
+            'if-tag-and01': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'yes'],
+            'if-tag-and02': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'no'],
+            'if-tag-and03': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'no'],
+            'if-tag-and04': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'no'],
+            'if-tag-and05': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': false}, 'no'],
+            'if-tag-and06': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'bar': false}, 'no'],
+            'if-tag-and07': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': true}, 'no'],
+            'if-tag-and08': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'bar': true}, 'no'],
+
+            //OR
+            'if-tag-or01': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'yes'],
+            'if-tag-or02': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'yes'],
+            'if-tag-or03': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'yes'],
+            'if-tag-or04': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'no'],
+            'if-tag-or05': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': false}, 'no'],
+            'if-tag-or06': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'bar': false}, 'no'],
+            'if-tag-or07': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': true}, 'yes'],
+            'if-tag-or08': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'bar': true}, 'yes'],
+
+            //multiple ORs
+            'if-tag-or09': ["{% if foo or bar or baz %}yes{% else %}no{% endif %}", {'baz': true}, 'yes'],
+
+            //NOT
+            'if-tag-not01': ["{% if not foo %}no{% else %}yes{% endif %}", {'foo': true}, 'yes'],
+            'if-tag-not02': ["{% if not not foo %}no{% else %}yes{% endif %}", {'foo': true}, 'no'],
+            //not03 to not05 removed, now TemplateSyntaxErrors
+
+            'if-tag-not06': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {}, 'no'],
+            'if-tag-not07': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'no'],
+            'if-tag-not08': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'yes'],
+            'if-tag-not09': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'no'],
+            'if-tag-not10': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'no'],
+
+            'if-tag-not11': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {}, 'no'],
+            'if-tag-not12': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'no'],
+            'if-tag-not13': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'no'],
+            'if-tag-not14': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'yes'],
+            'if-tag-not15': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'no'],
+
+            'if-tag-not16': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {}, 'yes'],
+            'if-tag-not17': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'yes'],
+            'if-tag-not18': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'yes'],
+            'if-tag-not19': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'no'],
+            'if-tag-not20': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'yes'],
+
+            'if-tag-not21': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {}, 'yes'],
+            'if-tag-not22': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'yes'],
+            'if-tag-not23': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'no'],
+            'if-tag-not24': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'yes'],
+            'if-tag-not25': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'yes'],
+
+            'if-tag-not26': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {}, 'yes'],
+            'if-tag-not27': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'no'],
+            'if-tag-not28': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'no'],
+            'if-tag-not29': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'no'],
+            'if-tag-not30': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'yes'],
+
+            'if-tag-not31': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {}, 'yes'],
+            'if-tag-not32': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': true}, 'no'],
+            'if-tag-not33': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': true, 'bar': false}, 'yes'],
+            'if-tag-not34': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': true}, 'yes'],
+            'if-tag-not35': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': false, 'bar': false}, 'yes'],
+
+            //Various syntax errors
+            'if-tag-error01': ["{% if %}yes{% endif %}", {}, Error],
+            'if-tag-error02': ["{% if foo and %}yes{% else %}no{% endif %}", {'foo': true}, Error],
+            'if-tag-error03': ["{% if foo or %}yes{% else %}no{% endif %}", {'foo': true}, Error],
+            'if-tag-error04': ["{% if not foo and %}yes{% else %}no{% endif %}", {'foo': true}, Error],
+            'if-tag-error05': ["{% if not foo or %}yes{% else %}no{% endif %}", {'foo': true}, Error],
+            'if-tag-error06': ["{% if abc def %}yes{% endif %}", {}, Error],
+            'if-tag-error07': ["{% if not %}yes{% endif %}", {}, Error],
+            'if-tag-error08': ["{% if and %}yes{% endif %}", {}, Error],
+            'if-tag-error09': ["{% if or %}yes{% endif %}", {}, Error],
+            'if-tag-error10': ["{% if == %}yes{% endif %}", {}, Error],
+            'if-tag-error11': ["{% if 1 == %}yes{% endif %}", {}, Error],
+            'if-tag-error12': ["{% if a not b %}yes{% endif %}", {}, Error],
+
+            //If evaluations are shortcircuited where possible
+            //If is_bad is invoked, it will raise a ShouldNotExecuteException
+            'if-tag-shortcircuit01': ['{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}', {'x': new TestObj()}, "yes"],
+            'if-tag-shortcircuit02': ['{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': new TestObj()}, "no"],
+
+            //Non-existent args
+            'if-tag-badarg01':["{% if x|default:y %}yes{% endif %}", {}, ''],
+            'if-tag-badarg02':["{% if x|default:y %}yes{% endif %}", {'y': 0}, ''],
+            'if-tag-badarg03':["{% if x|default:y %}yes{% endif %}", {'y': 1}, 'yes'],
+            'if-tag-badarg04':["{% if x|default:y %}yes{% else %}no{% endif %}", {}, 'no'],
       };
 
       for (var key in tests) {
@@ -553,12 +703,12 @@ if (require.main == module.id) {
 
 /*
 
-            'builtins01': ['{{ True }}', {}, "True"],
-            'builtins02': ['{{ False }}', {}, "False"],
+            'builtins01': ['{{ true }}', {}, "true"],
+            'builtins02': ['{{ false }}', {}, "false"],
             'builtins03': ['{{ None }}', {}, "None"],
 
             //In attribute and dict lookups that raise an unexpected exception
-            //without a "silent_variable_attribute" set to True, the exception
+            //without a "silent_variable_attribute" set to true, the exception
             //propagates
             // FIXME 'filter-syntax23': ['1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
             // FIXME  'filter-syntax24': ['1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
@@ -622,137 +772,6 @@ if (require.main == module.id) {
             'firstof09': ['{% firstof %}', {}, Error],
             'firstof10': ['{% firstof a %}', {'a': '<'}, '<'], //Variables are NOT auto-escaped.
 
-            //IF TAG ################################################################
-            'if-tag01': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"],
-            'if-tag02': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": False}, "no"],
-            'if-tag03': ["{% if foo %}yes{% else %}no{% endif %}", {}, "no"],
-
-            'if-tag04': ["{% if foo %}foo{% elif bar %}bar{% endif %}", {'foo': True}, "foo"],
-            'if-tag05': ["{% if foo %}foo{% elif bar %}bar{% endif %}", {'ba': True}, "bar"],
-            'if-tag06': ["{% if foo %}foo{% elif bar %}bar{% endif %}", {}, ""],
-            'if-tag07': ["{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {'foo': True}, "foo"],
-            'if-tag08': ["{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {'ba': True}, "bar"],
-            'if-tag09': ["{% if foo %}foo{% elif bar %}bar{% else %}nothing{% endif %}", {}, "nothing"],
-            'if-tag10': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'foo': True}, "foo"],
-            'if-tag11': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'ba': True}, "bar"],
-            'if-tag12': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {'baz': True}, "baz"],
-            'if-tag13': ["{% if foo %}foo{% elif bar %}bar{% elif baz %}baz{% else %}nothing{% endif %}", {}, "nothing"],
-
-            //Filters
-            'if-tag-filter01': ["{% if foo|length == 5 %}yes{% else %}no{% endif %}", {'foo': 'abcde'}, "yes"],
-            'if-tag-filter02': ["{% if foo|upper == 'ABC' %}yes{% else %}no{% endif %}", {}, "no"],
-
-            //Equality
-            'if-tag-eq01': ["{% if foo == bar %}yes{% else %}no{% endif %}", {}, "yes"],
-            'if-tag-eq02': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1}, "no"],
-            'if-tag-eq03': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'ba': 1}, "yes"],
-            'if-tag-eq04': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'ba': 2}, "no"],
-            'if-tag-eq05': ["{% if foo == '' %}yes{% else %}no{% endif %}", {}, "no"],
-
-            //Comparison
-            'if-tag-gt-01': ["{% if 2 > 1 %}yes{% else %}no{% endif %}", {}, "yes"],
-            'if-tag-gt-02': ["{% if 1 > 1 %}yes{% else %}no{% endif %}", {}, "no"],
-            'if-tag-gte-01': ["{% if 1 >= 1 %}yes{% else %}no{% endif %}", {}, "yes"],
-            'if-tag-gte-02': ["{% if 1 >= 2 %}yes{% else %}no{% endif %}", {}, "no"],
-            'if-tag-lt-01': ["{% if 1 < 2 %}yes{% else %}no{% endif %}", {}, "yes"],
-            'if-tag-lt-02': ["{% if 1 < 1 %}yes{% else %}no{% endif %}", {}, "no"],
-            'if-tag-lte-01': ["{% if 1 <= 1 %}yes{% else %}no{% endif %}", {}, "yes"],
-            'if-tag-lte-02': ["{% if 2 <= 1 %}yes{% else %}no{% endif %}", {}, "no"],
-
-            //Contains
-            'if-tag-in-01': ["{% if 1 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"],
-            'if-tag-in-02': ["{% if 2 in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"],
-            'if-tag-not-in-01': ["{% if 1 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "no"],
-            'if-tag-not-in-02': ["{% if 2 not in x %}yes{% else %}no{% endif %}", {'x':[1]}, "yes"],
-
-            //AND
-            'if-tag-and01': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'yes'],
-            'if-tag-and02': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'no'],
-            'if-tag-and03': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'no'],
-            'if-tag-and04': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'no'],
-            'if-tag-and05': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': False}, 'no'],
-            'if-tag-and06': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'ba': False}, 'no'],
-            'if-tag-and07': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'foo': True}, 'no'],
-            'if-tag-and08': ["{% if foo and bar %}yes{% else %}no{% endif %}", {'ba': True}, 'no'],
-
-            //OR
-            'if-tag-or01': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'yes'],
-            'if-tag-or02': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'yes'],
-            'if-tag-or03': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'yes'],
-            'if-tag-or04': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'no'],
-            'if-tag-or05': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': False}, 'no'],
-            'if-tag-or06': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'ba': False}, 'no'],
-            'if-tag-or07': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'foo': True}, 'yes'],
-            'if-tag-or08': ["{% if foo or bar %}yes{% else %}no{% endif %}", {'ba': True}, 'yes'],
-
-            //multiple ORs
-            'if-tag-or09': ["{% if foo or bar or baz %}yes{% else %}no{% endif %}", {'baz': True}, 'yes'],
-
-            //NOT
-            'if-tag-not01': ["{% if not foo %}no{% else %}yes{% endif %}", {'foo': True}, 'yes'],
-            'if-tag-not02': ["{% if not not foo %}no{% else %}yes{% endif %}", {'foo': True}, 'no'],
-            //not03 to not05 removed, now TemplateSyntaxErrors
-
-            'if-tag-not06': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {}, 'no'],
-            'if-tag-not07': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'no'],
-            'if-tag-not08': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'yes'],
-            'if-tag-not09': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'no'],
-            'if-tag-not10': ["{% if foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'no'],
-
-            'if-tag-not11': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {}, 'no'],
-            'if-tag-not12': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'no'],
-            'if-tag-not13': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'no'],
-            'if-tag-not14': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'yes'],
-            'if-tag-not15': ["{% if not foo and bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'no'],
-
-            'if-tag-not16': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {}, 'yes'],
-            'if-tag-not17': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'yes'],
-            'if-tag-not18': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'yes'],
-            'if-tag-not19': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'no'],
-            'if-tag-not20': ["{% if foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'yes'],
-
-            'if-tag-not21': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {}, 'yes'],
-            'if-tag-not22': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'yes'],
-            'if-tag-not23': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'no'],
-            'if-tag-not24': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'yes'],
-            'if-tag-not25': ["{% if not foo or bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'yes'],
-
-            'if-tag-not26': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {}, 'yes'],
-            'if-tag-not27': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'no'],
-            'if-tag-not28': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'no'],
-            'if-tag-not29': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'no'],
-            'if-tag-not30': ["{% if not foo and not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'yes'],
-
-            'if-tag-not31': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {}, 'yes'],
-            'if-tag-not32': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': True}, 'no'],
-            'if-tag-not33': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': True, 'ba': False}, 'yes'],
-            'if-tag-not34': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': True}, 'yes'],
-            'if-tag-not35': ["{% if not foo or not bar %}yes{% else %}no{% endif %}", {'foo': False, 'ba': False}, 'yes'],
-
-            //Various syntax errors
-            'if-tag-error01': ["{% if %}yes{% endif %}", {}, Error],
-            'if-tag-error02': ["{% if foo and %}yes{% else %}no{% endif %}", {'foo': True}, Error],
-            'if-tag-error03': ["{% if foo or %}yes{% else %}no{% endif %}", {'foo': True}, Error],
-            'if-tag-error04': ["{% if not foo and %}yes{% else %}no{% endif %}", {'foo': True}, Error],
-            'if-tag-error05': ["{% if not foo or %}yes{% else %}no{% endif %}", {'foo': True}, Error],
-            'if-tag-error06': ["{% if abc def %}yes{% endif %}", {}, Error],
-            'if-tag-error07': ["{% if not %}yes{% endif %}", {}, Error],
-            'if-tag-error08': ["{% if and %}yes{% endif %}", {}, Error],
-            'if-tag-error09': ["{% if or %}yes{% endif %}", {}, Error],
-            'if-tag-error10': ["{% if == %}yes{% endif %}", {}, Error],
-            'if-tag-error11': ["{% if 1 == %}yes{% endif %}", {}, Error],
-            'if-tag-error12': ["{% if a not b %}yes{% endif %}", {}, Error],
-
-            //If evaluations are shortcircuited where possible
-            //If is_bad is invoked, it will raise a ShouldNotExecuteException
-            'if-tag-shortcircuit01': ['{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "yes"],
-            'if-tag-shortcircuit02': ['{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"],
-
-            //Non-existent args
-            'if-tag-badarg01':("{% if x|defaultifnull:y %}yes{% endif %}", {}, ''],
-            'if-tag-badarg02':("{% if x|defaultifnull:y %}yes{% endif %}", {'y': 0}, ''],
-            'if-tag-badarg03':("{% if x|defaultifnull:y %}yes{% endif %}", {'y': 1}, 'yes'],
-            'if-tag-badarg04':("{% if x|defaultifnull:y %}yes{% else %}no{% endif %}", {}, 'no'],
 
             //Additional, more precise parsing tests are in SmartIfTests
 

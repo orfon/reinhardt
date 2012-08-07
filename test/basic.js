@@ -388,6 +388,21 @@ exports.testBasic = function() {
             'ifnotequal03': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 2}, "yes"],
             'ifnotequal04': ["{% ifnotequal a b %}yes{% else %}no{% endifnotequal %}", {"a": 1, "b": 1}, "no"],
 
+            //NAMED ENDBLOCKS #######################################################
+
+            //Basic test
+            'namedendblocks01': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'],
+
+            //Unbalanced blocks
+            'namedendblocks02': ["1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, Error],
+            'namedendblocks03': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, Error],
+            'namedendblocks04': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, Error],
+            'namedendblocks05': ["1{% block first %}_{% block second %}2{% endblock first %}", {}, Error],
+
+            //Mixed named and unnamed endblocks
+            'namedendblocks06': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'],
+            'namedendblocks07': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock %}3", {}, '1_2_3'],
+
             //INHERITANCE ###########################################################
 
             //Standard template with no inheritance
@@ -782,140 +797,6 @@ if (require.main == module.id) {
             'include-error08': ['{% include "include-fail2" %}', {}, ('', '', Error)],
             'include-error09': ['{% include failed_include %}', {'failed_include': 'include-fail1'}, ('', '', RuntimeError)],
             'include-error10': ['{% include failed_include %}', {'failed_include': 'include-fail2'}, ('', '', Error)],
-
-
-            //NAMED ENDBLOCKS #######################################################
-
-            //Basic test
-            'namedendblocks01': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'],
-
-            //Unbalanced blocks
-            'namedendblocks02': ["1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, Error],
-            'namedendblocks03': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, Error],
-            'namedendblocks04': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, Error],
-            'namedendblocks05': ["1{% block first %}_{% block second %}2{% endblock first %}", {}, Error],
-
-            //Mixed named and unnamed endblocks
-            'namedendblocks06': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'],
-            'namedendblocks07': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock %}3", {}, '1_2_3'],
-
-            //INHERITANCE ###########################################################
-
-            //Standard template with no inheritance
-            'inheritance01': ["1{% block first %}&{% endblock %}3{% block second %}_{% endblock %}", {}, '1&3_'],
-
-            //Standard two-level inheritance
-            'inheritance02': ["{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {}, '1234'],
-
-            //Three-level with no redefinitions on third level
-            'inheritance03': ["{% extends 'inheritance02' %}", {}, '1234'],
-
-            //Two-level with no redefinitions on second level
-            'inheritance04': ["{% extends 'inheritance01' %}", {}, '1&3_'],
-
-            //Two-level with double quotes instead of single quotes
-            'inheritance05': ['{% extends "inheritance02" %}', {}, '1234'],
-
-            //Three-level with variable parent-template name
-            'inheritance06': ["{% extends foo %}", {'foo': 'inheritance02'}, '1234'],
-
-            //Two-level with one block defined, one block not defined
-            'inheritance07': ["{% extends 'inheritance01' %}{% block second %}5{% endblock %}", {}, '1&35'],
-
-            //Three-level with one block defined on this level, two blocks defined next level
-            'inheritance08': ["{% extends 'inheritance02' %}{% block second %}5{% endblock %}", {}, '1235'],
-
-            //Three-level with second and third levels blank
-            'inheritance09': ["{% extends 'inheritance04' %}", {}, '1&3_'],
-
-            //Three-level with space NOT in a block -- should be ignored
-            'inheritance10': ["{% extends 'inheritance04' %}      ", {}, '1&3_'],
-
-            //Three-level with both blocks defined on this level, but none on second level
-            'inheritance11': ["{% extends 'inheritance04' %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {}, '1234'],
-
-            //Three-level with this level providing one and second level providing the other
-            'inheritance12': ["{% extends 'inheritance07' %}{% block first %}2{% endblock %}", {}, '1235'],
-
-            //Three-level with this level overriding second level
-            'inheritance13': ["{% extends 'inheritance02' %}{% block first %}a{% endblock %}{% block second %}b{% endblock %}", {}, '1a3b'],
-
-            //A block defined only in a child template shouldn't be displayed
-            'inheritance14': ["{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}", {}, '1&3_'],
-
-            //A block within another block
-            'inheritance15': ["{% extends 'inheritance01' %}{% block first %}2{% block inner %}inner{% endblock %}{% endblock %}", {}, '12inner3_'],
-
-            //A block within another block (level 2)
-            'inheritance16': ["{% extends 'inheritance15' %}{% block inner %}out{% endblock %}", {}, '12out3_'],
-
-            //{% load %} tag (parent -- setup for exception04)
-            'inheritance17': ["{% load testtags %}{% block first %}1234{% endblock %}", {}, '1234'],
-
-            //{% load %} tag (standard usage, without inheritance)
-            'inheritance18': ["{% load testtags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
-
-            //{% load %} tag (within a child template)
-            'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% load testtags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
-
-            //Two-level inheritance with {{ block.super }}
-            'inheritance20': ["{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'],
-
-            //Three-level inheritance with {{ block.super }} from parent
-            'inheritance21': ["{% extends 'inheritance02' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '12a34'],
-
-            //Three-level inheritance with {{ block.super }} from grandparent
-            'inheritance22': ["{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'],
-
-            //Three-level inheritance with {{ block.super }} from parent and grandparent
-            'inheritance23': ["{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1&ab3_'],
-
-            //Inheritance from local context without use of template loader
-            'inheritance24': ["{% extends context_template %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")}, '1234'],
-
-            //Inheritance from local context with variable parent template
-            'inheritance25': ["{% extends context_template.1 %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': [template.Template("Wrong"], template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")]}, '1234'],
-
-            //Set up a base template to extend
-            'inheritance26': ["no tags", {}, 'no tags'],
-
-            //Inheritance from a template that doesn't have any blocks
-            'inheritance27': ["{% extends 'inheritance26' %}", {}, 'no tags'],
-
-            //Set up a base template with a space in it.
-            'inheritance 28': ["{% block first %}!{% endblock %}", {}, '!'],
-
-            //Inheritance from a template with a space in its name should work.
-            'inheritance29': ["{% extends 'inheritance 28' %}", {}, '!'],
-
-            //Base template, putting block in a conditional {% if %} tag
-            'inheritance30': ["1{% if optional %}{% block opt %}2{% endblock %}{% endif %}3", {'optional': True}, '123'],
-
-            //Inherit from a template with block wrapped in an {% if %} tag (in parent], still gets overridden
-            'inheritance31': ["{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {'optional': True}, '1two3'],
-            'inheritance32': ["{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {}, '13'],
-
-            //Base template, putting block in a conditional {% ifequal %} tag
-            'inheritance33': ["1{% ifequal optional 1 %}{% block opt %}2{% endblock %}{% endifequal %}3", {'optional': 1}, '123'],
-
-            //Inherit from a template with block wrapped in an {% ifequal %} tag (in parent], still gets overridden
-            'inheritance34': ["{% extends 'inheritance33' %}{% block opt %}two{% endblock %}", {'optional': 1}, '1two3'],
-            'inheritance35': ["{% extends 'inheritance33' %}{% block opt %}two{% endblock %}", {'optional': 2}, '13'],
-
-            //Base template, putting block in a {% for %} tag
-            'inheritance36': ["{% for n in numbers %}_{% block opt %}{{ n }}{% endblock %}{% endfor %}_", {'numbers': '123'}, '_1_2_3_'],
-
-            //Inherit from a template with block wrapped in an {% for %} tag (in parent], still gets overridden
-            'inheritance37': ["{% extends 'inheritance36' %}{% block opt %}X{% endblock %}", {'numbers': '123'}, '_X_X_X_'],
-            'inheritance38': ["{% extends 'inheritance36' %}{% block opt %}X{% endblock %}", {}, '_'],
-
-            //The super block will still be found.
-            'inheritance39': ["{% extends 'inheritance30' %}{% block opt %}new{{ block.super }}{% endblock %}", {'optional': True}, '1new23'],
-            'inheritance40': ["{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}", {'optional': 1}, '1new23'],
-            'inheritance41': ["{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}", {'numbers': '123'}, '_new1_new2_new3_'],
-
-            //Expression starting and ending with a quote
-            'inheritance42': ["{% extends 'inheritance02'|cut:' ' %}", {}, '1234'],
 
             //LOADING TAG LIBRARIES #################################################
             'load01': ["{% load testtags subpackage.echo %}{% echo test %} {% echo2 \"test\" %}", {}, "test test"],

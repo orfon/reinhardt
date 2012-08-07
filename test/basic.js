@@ -132,6 +132,64 @@ exports.testBasic = function() {
             'basic-syntax35': ["{{ 1 }}", {"1": "abc"}, "1"],
             'basic-syntax36': ["{{ 1.2 }}", {"1": "abc"}, "1.2"],
 
+            //Call methods in the top level of the context
+            'basic-syntax37': ['{{ callable }}', {"callable": function() { return "foo bar";}}, "foo bar"],
+
+            //Call methods returned from dictionary lookups
+            'basic-syntax38': ['{{ var.callable }}', {"var": {"callable": function() { return "foo bar"}}}, "foo bar"],
+
+            //////// ################ list index
+            //List-index syntax allows a template to access a certain item of a subscriptable object.
+            'list-index01': ["{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"],
+
+            //Fail silently when the list index is out of range.
+            'list-index02': ["{{ var.5 }}", {"var": ["first item", "second item"]}, ("", "INVALID")],
+
+            //Fail silently when the variable is not a subscriptable object.
+            'list-index03': ["{{ var.1 }}", {"var": undefined}, "INVALID"],
+
+            //Fail silently when variable is a dict without the specified key.
+            'list-index04': ["{{ var.1 }}", {"var": {}}, "INVALID"],
+
+            //Dictionary lookup wins out when dict's key is a string.
+            'list-index05': ["{{ var.1 }}", {"var": {'1': "hello"}}, "hello"],
+
+            //But list-index lookup wins out when dict's key is an int, which
+            //behind the scenes is really a dictionary lookup (for a dict)
+            //after converting the key to an int.
+            'list-index06': ["{{ var.1 }}", {"var": {1: "hello"}}, "hello"],
+
+            // WONTFIX in JS the key is always also tried as a string
+            //Dictionary lookup wins out when there is a string and int version of the key.
+            'list-index07': ["{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "world"],
+
+            //COMMENT SYNTAX ########################################################
+/*
+            FIXME where is this documented?
+            'comment-syntax01': ["{//this is hidden #}hello", {}, "hello"],
+            'comment-syntax02': ["{//this is hidden #}hello{//foo #}", {}, "hello"],
+
+            //Comments can contain invalid stuff.
+            'comment-syntax03': ["foo{// {% if %}  #}", {}, "foo"],
+            'comment-syntax04': ["foo{// {% endblock %}  #}", {}, "foo"],
+            'comment-syntax05': ["foo{// {% somerandomtag %}  #}", {}, "foo"],
+            'comment-syntax06': ["foo{//{% #}", {}, "foo"],
+            'comment-syntax07': ["foo{//%} #}", {}, "foo"],
+            'comment-syntax08': ["foo{//%} #}bar", {}, "foobar"],
+            'comment-syntax09': ["foo{//{{ #}", {}, "foo"],
+            'comment-syntax10': ["foo{//}} #}", {}, "foo"],
+            'comment-syntax11': ["foo{//{ #}", {}, "foo"],
+            'comment-syntax12': ["foo{//} #}", {}, "foo"],
+*/
+            //COMMENT TAG ###########################################################
+            'comment-tag01': ["{% comment %}this is hidden{% endcomment %}hello", {}, "hello"],
+            'comment-tag02': ["{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"],
+
+            //Comment tag can contain invalid stuff.
+            'comment-tag03': ["foo{% comment %} {% if %} {% endcomment %}", {}, "foo"],
+            'comment-tag04': ["foo{% comment %} {% endblock %} {% endcomment %}", {}, "foo"],
+            'comment-tag05': ["foo{% comment %} {% somerandomtag %} {% endcomment %}", {}, "foo"],
+
             //FOR TAG ###########################################################
             'for-tag01': ["{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag02': ["{% for val in values reversed %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "321"],
@@ -480,69 +538,15 @@ if (require.main == module.id) {
 
 /*
 
-            //Call methods in the top level of the context
-            'basic-syntax37': ['{{ callable }}', {"callable": lambda: "foo bar"}, "foo bar"],
-
-            //Call methods returned from dictionary lookups
-            'basic-syntax38': ['{{ var.callable }}', {"var": {"callable": lambda: "foo bar"}}, "foo bar"],
-
             'builtins01': ['{{ True }}', {}, "True"],
             'builtins02': ['{{ False }}', {}, "False"],
             'builtins03': ['{{ None }}', {}, "None"],
-
-            //List-index syntax allows a template to access a certain item of a subscriptable object.
-            'list-index01': ["{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"],
-
-            //Fail silently when the list index is out of range.
-            'list-index02': ["{{ var.5 }}", {"var": ["first item", "second item"]}, ("", "INVALID")],
-
-            //Fail silently when the variable is not a subscriptable object.
-            'list-index03': ["{{ var.1 }}", {"var": None}, ("", "INVALID")],
-
-            //Fail silently when variable is a dict without the specified key.
-            'list-index04': ["{{ var.1 }}", {"var": {}}, ("", "INVALID")],
-
-            //Dictionary lookup wins out when dict's key is a string.
-            'list-index05': ["{{ var.1 }}", {"var": {'1': "hello"}}, "hello"],
-
-            //But list-index lookup wins out when dict's key is an int, which
-            //behind the scenes is really a dictionary lookup (for a dict)
-            //after converting the key to an int.
-            'list-index06': ["{{ var.1 }}", {"var": {1: "hello"}}, "hello"],
-
-            //Dictionary lookup wins out when there is a string and int version of the key.
-            'list-index07': ["{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"],
 
             //In attribute and dict lookups that raise an unexpected exception
             //without a "silent_variable_attribute" set to True, the exception
             //propagates
             // FIXME 'filter-syntax23': ['1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
             // FIXME  'filter-syntax24': ['1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
-
-            //COMMENT SYNTAX ########################################################
-            'comment-syntax01': ["{//this is hidden #}hello", {}, "hello"],
-            'comment-syntax02': ["{//this is hidden #}hello{//foo #}", {}, "hello"],
-
-            //Comments can contain invalid stuff.
-            'comment-syntax03': ["foo{// {% if %}  #}", {}, "foo"],
-            'comment-syntax04': ["foo{// {% endblock %}  #}", {}, "foo"],
-            'comment-syntax05': ["foo{// {% somerandomtag %}  #}", {}, "foo"],
-            'comment-syntax06': ["foo{//{% #}", {}, "foo"],
-            'comment-syntax07': ["foo{//%} #}", {}, "foo"],
-            'comment-syntax08': ["foo{//%} #}bar", {}, "foobar"],
-            'comment-syntax09': ["foo{//{{ #}", {}, "foo"],
-            'comment-syntax10': ["foo{//}} #}", {}, "foo"],
-            'comment-syntax11': ["foo{//{ #}", {}, "foo"],
-            'comment-syntax12': ["foo{//} #}", {}, "foo"],
-
-            //COMMENT TAG ###########################################################
-            'comment-tag01': ["{% comment %}this is hidden{% endcomment %}hello", {}, "hello"],
-            'comment-tag02': ["{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"],
-
-            //Comment tag can contain invalid stuff.
-            'comment-tag03': ["foo{% comment %} {% if %} {% endcomment %}", {}, "foo"],
-            'comment-tag04': ["foo{% comment %} {% endblock %} {% endcomment %}", {}, "foo"],
-            'comment-tag05': ["foo{% comment %} {% somerandomtag %} {% endcomment %}", {}, "foo"],
 
             //CYCLE TAG #############################################################
             'cycle01': ['{% cycle a %}', {}, Error],

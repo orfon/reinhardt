@@ -3,6 +3,7 @@ exports.testFilterExpression = require('./variable');
 exports.testFilterExpression = require('./filterexpression');
 exports.testLexer = require('./lexer');
 exports.testTemplate = require('./template');
+exports.testContext = require('./context');
 exports.testBasic = require('./basic');
 
 // start the test runner if we're called directly from command line

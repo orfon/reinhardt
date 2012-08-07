@@ -1,9 +1,9 @@
-
-exports.testFilterExpression = require('./variable');
+exports.testContext = require('./context');
+exports.variable = require('./variable');
 exports.testFilterExpression = require('./filterexpression');
 exports.testLexer = require('./lexer');
+exports.testNodeList = require('./nodelist');
 exports.testTemplate = require('./template');
-exports.testContext = require('./context');
 exports.testBasic = require('./basic');
 
 // start the test runner if we're called directly from command line

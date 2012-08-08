@@ -219,8 +219,8 @@ exports.testBasic = function() {
             'for-tag-vars02': ["{% for val in values %}{{ forloop.counter0 }}{% endfor %}", {"values": [6, 6, 6]}, "012"],
             'for-tag-vars03': ["{% for val in values %}{{ forloop.revcounter }}{% endfor %}", {"values": [6, 6, 6]}, "321"],
             'for-tag-vars04': ["{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}", {"values": [6, 6, 6]}, "210"],
-            // FIXME NEED IFTAG 'for-tag-vars05': ["{% for val in values %}{% if forloop.first %}f{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "fxx"],
-            // FIXME NEED IFTAG 'for-tag-vars06': ["{% for val in values %}{% if forloop.last %}l{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "xxl"],
+            'for-tag-vars05': ["{% for val in values %}{% if forloop.first %}f{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "fxx"],
+            'for-tag-vars06': ["{% for val in values %}{% if forloop.last %}l{% else %}x{% endif %}{% endfor %}", {"values": [6, 6, 6]}, "xxl"],
             'for-tag-unpack01': ["{% for key,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
             'for-tag-unpack03': ["{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
             'for-tag-unpack04': ["{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
@@ -516,12 +516,11 @@ exports.testBasic = function() {
             'inheritance29': ["{% extends 'inheritance 28' %}", {}, '!'],
 
             //Base template, putting block in a conditional {% if %} tag
-            // FIXME if tag
-            // 'inheritance30': ["1{% if optional %}{% block opt %}2{% endblock %}{% endif %}3", {'optional': true}, '123'],
+            'inheritance30': ["1{% if optional %}{% block opt %}2{% endblock %}{% endif %}3", {'optional': true}, '123'],
 
             //Inherit from a template with block wrapped in an {% if %} tag (in parent], still gets overridden
-            //'inheritance31': ["{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {'optional': true}, '1two3'],
-            //'inheritance32': ["{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {}, '13'],
+            'inheritance31': ["{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {'optional': true}, '1two3'],
+            'inheritance32': ["{% extends 'inheritance30' %}{% block opt %}two{% endblock %}", {}, '13'],
 
             //Base template, putting block in a conditional {% ifequal %} tag
             'inheritance33': ["1{% ifequal optional 1 %}{% block opt %}2{% endblock %}{% endifequal %}3", {'optional': 1}, '123'],

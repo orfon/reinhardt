@@ -155,6 +155,11 @@ exports.testBasic = function() {
             //Call methods returned from dictionary lookups
             'basic-syntax38': ['{{ var.callable }}', {"var": {"callable": function() { return "foo bar"}}}, "foo bar"],
 
+            // BUILT INS
+            'builtins01': ['{{ true }}', {}, "true"],
+            'builtins02': ['{{ false }}', {}, "false"],
+            'builtins03': ['{{ null }}', {}, "null"],
+
             //////// ################ list index
             //List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ["{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"],
@@ -703,9 +708,6 @@ if (require.main == module.id) {
 
 /*
 
-            'builtins01': ['{{ true }}', {}, "true"],
-            'builtins02': ['{{ false }}', {}, "false"],
-            'builtins03': ['{{ None }}', {}, "None"],
 
             //In attribute and dict lookups that raise an unexpected exception
             //without a "silent_variable_attribute" set to true, the exception

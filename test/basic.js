@@ -546,6 +546,15 @@ exports.testBasic = function() {
             // 'inheritance42': ["{% extends 'inheritance02'|cut:' ' %}", {}, '1234'],
 
 
+            //Raise exception for invalid template name
+            'exception01': ["{% extends 'nonexistent' %}", {}, Error],
+
+            //Raise exception for invalid template name (in variable)
+            'exception02': ["{% extends nonexistent %}", {}, Error],
+
+            //Raise exception for extra {% extends %} tags
+            'exception03': ["{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% extends 'inheritance16' %}", {}, Error],
+
             //IF TAG ################################################################
             'if-tag01': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": true}, "yes"],
             'if-tag02': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": false}, "no"],
@@ -743,14 +752,6 @@ if (require.main == module.id) {
 
             //EXCEPTIONS ############################################################
 
-            //Raise exception for invalid template name
-            'exception01': ["{% extends 'nonexistent' %}", {}, (template.TemplateDoesNotExist, template.TemplateDoesNotExist)],
-
-            //Raise exception for invalid template name (in variable)
-            'exception02': ["{% extends nonexistent %}", {}, (Error, template.TemplateDoesNotExist)],
-
-            //Raise exception for extra {% extends %} tags
-            'exception03': ["{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% extends 'inheritance16' %}", {}, Error],
 
             //Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ["{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, Error],

@@ -11,8 +11,8 @@ var context = {
 }
 
 exports.app = function(req) {
-   var path = req.pathInfo.split('/').slice(1)[0] || 'base.html';
-   return renderResponse(path, context);
+   var templateName = req.pathInfo.split('/').slice(1)[0] || 'base.html';
+   return renderResponse(templateName, context);
 };
 
 if (require.main == module) {

@@ -1,0 +1,26 @@
+<html>
+<body style="width:30em">
+   <h1>Django Reinhardt</h1>
+
+   <div style="border:1px solid yello;">
+      {% include "links.html" %}
+   </div>
+
+   <div style="border:1px solid red; min-height:200px">
+      {% block content %}
+
+      Django Reinhardt (French pronunciation: [dʒɑ̃ɡo ʁenɑʁt]; 23 January 1910 – 16 May 1953) was a pioneering virtuoso Belgian jazz guitarist and composer.
+
+      {% endblock %}
+   </div>
+
+   <img style="margin: 10px" src="data:image/jpeg;charset=utf8;base64,{{djangoImage}}">
+
+   <div style="border: 1px solid blue;margin-top:10px">
+      {% block footer %}
+      Power by the Reinhardt Templating System [RTS]
+      {% endblock %}
+   </div>
+<body>
+
+</html>

@@ -1,39 +1,108 @@
-todos
-=============
+Reinhardt - Django templates for RingoJs
+=============================================
 
- * iftag
-   * django has quiet extensive SmartIfParser to do that
-   * dojo solution looks simpler
- * loadtag should
-    {% load packageFoo.filters %}
-    {% load filterBar from packageFoo.filters %}
- * autoescape
-   * default: reinhardt escapes everything coming from filters/tags
-   * unless: isSafe=true on the function
-   * see django doc
-   * also {% autoescape off %} tag
+This is a JavaScript implementation of the Django Template System as described in <http://www.djangoproject.com/documentation/templates/> for RingoJs. A useful set of tags and filters has already been implemented (see below).
 
-helpfull texts
-===================
+ * aims to be functionally equivalent to the current django master
+ * beta software
+ * not intended to work in a browser environment
 
-https://docs.djangoproject.com/en/1.4/ref/templates/api/
-
-https://docs.djangoproject.com/en/1.4/howto/custom-template-tags/
-
-http://pastebin.com/344D0LMS
-
-http://www.pocoo.org/~mitsuhiko/django-templates-blogpost.html
-
-escape regex js
-http://simonwillison.net/2006/Jan/20/escape/#p-6
-
-regex escape https://github.com/slevithan/XRegExp/blob/master/src/xregexp.js#L536
-
-dojox/dtl/_base
+Implemented filters and tags
+=================================
 
 
-helma thoughts
-=====================
+| Implemented |     Tag     |
+|      X      | block       |
+|      X      | comment     |
+|             | cycle       |
+|             | debug       |
+|      X      | extends     |
+|      X      | filter      |
+|             | firstof     |
+|      X      | for         |
+|      X      | if          |
+|      X      | ifchanged   |
+|      X      | ifequal     |
+|      X      | ifnotequal  |
+|      X      | include     |
+|             | load        |
+|             | now         |
+|             | regroup     |
+|             | spaceless   |
+|             | ssi         |
+|             | templatetag |
+|     N/A     | url         |
+|             | widthratio  |
+|             | with        |
 
-  * `default` should be a filter
-  * filter haben nur EIN argument (das eine variable sein kann)
+| Implemented | Filter             |
+|             | add                |
+|      X      | addslashes         |
+|      X      | capfirst           |
+|      X      | center             |
+|      X      | cut                |
+|             | date               |
+|      X      | default            |
+|     N/A     | default_if_none    |
+|     NEW     | defaultifnull
+|             | dictsort           |
+|             | dictsort_reversed  |
+|             | divisibleby        |
+|      X      | escape             |
+|             | filesizeformat     |
+|             | first              |
+|      X      | fix_ampersands     |
+|      X      | floatformat        |
+|             | get_digit          |
+|             | iriencode          |
+|      X      | join               |
+|      X      | length             |
+|      X      | length_is          |
+|      X      | linebreaks         |
+|      X      | linebreaksbr       |
+|      X      | linenumbers        |
+|      X      | ljust              |
+|      X      | lower              |
+|      X      | make_list          |
+|             | phone2numeric      |
+|             | pluralize          |
+|             | pprint             |
+|             | random             |
+|      X      | removetags         |
+|      X      | rjust              |
+|      X      | slice              |
+|      X      | slugify            |
+|      X      | stringformat       |
+|      X      | striptags          |
+|             | time               |
+|             | timesince          |
+|             | timeuntil          |
+|      X      | title              |
+|      X      | truncatewords      |
+|      X      | truncatewords_html |
+|             | unordered_list     |
+|      X      | upper              |
+|             | urlencode          |
+|             | urlize             |
+|             | urlizetrunc        |
+|      X      | wordcount          |
+|      X      | wordwrap           |
+|      X      | yesno              |
+
+
+Urgent Todos
+================
+
+ * Missing {% load %}
+  *  {% loadfilter packageFoo.filters %}
+  * {% loadfilter filterBar from packageFoo.filters %}
+  * same for {% loadtag .. %}
+ * improve the FilterExpression RegEx
+  * the correct regex in django: <https://github.com/django/django/blob/master/django/template/base.py#L481-513>
+  * my regex still fails for some edge cases (see unit tests)
+
+
+About the code
+===============
+
+Most of this code is a literal translation of Django's code; some regular expressions and the basis for a lot of filters was taken from Dojox' dtl package <https://github.com/dojo/dojox/tree/master/dtl>.

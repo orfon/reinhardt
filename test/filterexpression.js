@@ -38,7 +38,7 @@ exports.testResolving = function() {
 exports.testParsing = function() {
    var fe = new FilterExpression('"Foobar"');
    assert.deepEqual(fe.filters, []);
-   assert.strictEqual(fe.resolve({}), "Foobar");
+   assert.equal(fe.resolve({}), "Foobar");
 
    var parser = new Parser('');
    var fe = new FilterExpression('"Foobar"|upper', parser);

@@ -267,8 +267,7 @@ exports.testBasic = function() {
             'filter-syntax08': ["{% %}", {}, Error],
 
             //Chained filters, with an argument to the first one
-            // FIXME missing removetags
-            // 'filter-syntax09': ['{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"],
+            'filter-syntax09': ['{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"],
 
             //Literal string as argument is always "safe" from auto-escaping..
             // FIXME fix regex
@@ -283,8 +282,7 @@ exports.testBasic = function() {
 
             //Fail silently for methods that raise an exception with a
             //"silent_variable_failure" attribute
-            // FIXME
-            // 'filter-syntax13': ['1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
+            'filter-syntax13': ['1{{ var.method3 }}2', {"var": new SomeClass()}, ("12", "1INVALID2")],
 
             //In methods that raise an exception without a
             //"silent_variable_attribute" set to true, the exception propagates
@@ -309,8 +307,7 @@ exports.testBasic = function() {
             // 'filter-syntax18': ['{{ var }}', {'va': UTF8Class()}, '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'],
 
             //Numbers as filter arguments should work
-            // FIXME truncatewords filter
-            // 'filter-syntax19': ['{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."],
+            'filter-syntax19': ['{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."],
 
             //filters should accept empty string constants
             // FIXME it does but the regex doesn't work for ""
@@ -342,9 +339,8 @@ exports.testBasic = function() {
             'include12': ['{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, '1 --- INVALID'],
 
             //autoescape context
-            // FIXME implement autoescape tag
-            // 'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, ('& --- ', '& --- INVALID')],
-            // 'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, ('& --- ', '& --- INVALID')],
+            'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, '& --- INVALID'],
+            'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, '& --- INVALID'],
 
             'include-error01': ['{% include "basic-syntax01" with %}', {}, Error],
             'include-error02': ['{% include "basic-syntax01" with "no key" %}', {}, Error],

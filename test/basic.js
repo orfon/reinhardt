@@ -716,7 +716,41 @@ exports.testBasic = function() {
             'cycle23': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"],
             'included-cycle': ['{{ abc }}', {'abc': 'xxx'}, 'xxx'],
             'cycle24': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"],
-            'cycle25': ["{% cycle a,b,c as bar %}{% cycle 1,2,3 as foo %}{% cycle bar %}{% cycle foo %}{% cycle bar %}{% cycle foo %}", {}, "a1b2c3"]
+            'cycle25': ["{% cycle a,b,c as bar %}{% cycle 1,2,3 as foo %}{% cycle bar %}{% cycle foo %}{% cycle bar %}{% cycle foo %}", {}, "a1b2c3"],
+
+            //IFCHANGED TAG #########################################################
+            'ifchanged01': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,2,3]}, '123'],
+            'ifchanged02': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,1,3]}, '13'],
+            'ifchanged03': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,1,1]}, '1'],
+            'ifchanged04': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': [1, 2, 3], 'numx': [2, 2, 2]}, '122232'],
+            'ifchanged05': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': [1, 1, 1], 'numx': [1, 2, 3]}, '1123123123'],
+            'ifchanged06': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': [1, 1, 1], 'numx': [2, 2, 2]}, '1222'],
+            'ifchanged07': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% for y in numy %}{% ifchanged %}{{ y }}{% endifchanged %}{% endfor %}{% endfor %}{% endfor %}', {'num': [1, 1, 1], 'numx': [2, 2, 2], 'numy': [3, 3, 3]}, '1233323332333'],
+            'ifchanged08': ['{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[[1, 'a'], [1, 'a'], [0, 'b'], [1, 'c']], [[0, 'a'], [1, 'c'], [1, 'd'], [1, 'd'], [0, 'e']]]}, 'accd'],
+
+            //Test one parameter given to ifchanged.
+            'ifchanged-param01': ['{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': [1,2,3] }, '..1..2..3'],
+            'ifchanged-param02': ['{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': [1,2,3], 'numx': [5,6,7] }, '..567..567..567'],
+
+            //Test multiple parameters to ifchanged.
+            'ifchanged-param03': ['{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': [1,1,2], 'numx': [5,6,6] }, '156156256'],
+
+            //Test a date+hour like construct, where the hour of the last day
+            //is the same but the date had changed, so print the hour anyway.
+            'ifchanged-param04': ['{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'],
+
+            //Logically the same as above, just written with explicit
+            //ifchanged for the day.
+            'ifchanged-param05': ['{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'],
+
+            //Test the else clause of ifchanged.
+            'ifchanged-else01': ['{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'],
+
+            'ifchanged-else02': ['{% for id in ids %}{{ id }}-{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,'],
+            'ifchanged-else03': ['{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'],
+
+            'ifchanged-else04': ['{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'],
+
 
       };
 
@@ -780,39 +814,6 @@ if (require.main == module.id) {
 
 
             //Additional, more precise parsing tests are in SmartIfTests
-
-            ##//IFCHANGED TAG #########################################################
-            'ifchanged01': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,2,3)}, '123'],
-            'ifchanged02': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,1,3)}, '13'],
-            'ifchanged03': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,1,1)}, '1'],
-            'ifchanged04': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': [1, 2, 3], 'numx': [2, 2, 2)}, '122232'],
-            'ifchanged05': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': [1, 1, 1], 'numx': [1, 2, 3)}, '1123123123'],
-            'ifchanged06': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', {'num': [1, 1, 1], 'numx': [2, 2, 2)}, '1222'],
-            'ifchanged07': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% for y in numy %}{% ifchanged %}{{ y }}{% endifchanged %}{% endfor %}{% endfor %}{% endfor %}', {'num': [1, 1, 1], 'numx': [2, 2, 2], 'numy': [3, 3, 3)}, '1233323332333'],
-            'ifchanged08': ['{% for data in datalist %}{% for c,d in data %}{% if c %}{% ifchanged %}{{ d }}{% endifchanged %}{% endif %}{% endfor %}{% endfor %}', {'datalist': [[(1, 'a'], (1, 'a'], (0, 'b'], (1, 'c')], [(0, 'a'], (1, 'c'], (1, 'd'], (1, 'd'], (0, 'e')]]}, 'accd'],
-
-            //Test one parameter given to ifchanged.
-            'ifchanged-param01': ['{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': [1,2,3) }, '..1..2..3'],
-            'ifchanged-param02': ['{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': [1,2,3], 'numx': [5,6,7) }, '..567..567..567'],
-
-            //Test multiple parameters to ifchanged.
-            'ifchanged-param03': ['{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': [1,1,2], 'numx': [5,6,6) }, '156156256'],
-
-            //Test a date+hour like construct, where the hour of the last day
-            //is the same but the date had changed, so print the hour anyway.
-            'ifchanged-param04': ['{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'],
-
-            //Logically the same as above, just written with explicit
-            //ifchanged for the day.
-            'ifchanged-param05': ['{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'],
-
-            //Test the else clause of ifchanged.
-            'ifchanged-else01': ['{% for id in ids %}{{ id }}{% ifchanged id %}-first{% else %}-other{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-first,1-other,2-first,2-other,2-other,3-first,'],
-
-            'ifchanged-else02': ['{% for id in ids %}{{ id }}-{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,'],
-            'ifchanged-else03': ['{% for id in ids %}{{ id }}{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %},{% endfor %}', {'ids': [1,1,2,2,2,3]}, '1-red,1,2-blue,2,2,3-red,'],
-
-            'ifchanged-else04': ['{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'],
 
 
             //INCLUSION ERROR REPORTING #############################################

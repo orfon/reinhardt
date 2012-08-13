@@ -45,21 +45,21 @@ exports.testParsing = function() {
       null
    );
 
-   assert.strictEqual(
+   assert.equal(
       new Variable('"false"').resolve({}),
       'false'
    );
-   assert.strictEqual(
+   assert.equal(
       new Variable('"A constant string"').resolve({}),
       "A constant string"
    );
 
    // escaped quotes work
-   assert.strictEqual(
+   assert.equal(
       new Variable('"Some \"Good\" News"').resolve({}),
       'Some "Good" News'
    );
-   assert.strictEqual(
+   assert.equal(
       new Variable('"Some \'Good\' News"').resolve({}),
       "Some 'Good' News"
    );

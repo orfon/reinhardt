@@ -310,8 +310,7 @@ exports.testBasic = function() {
             'filter-syntax19': ['{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."],
 
             //filters should accept empty string constants
-            // FIXME it does but the regex doesn't work for ""
-            // filter-syntax20': ['{{ ""|defaultifnull:"was none" }}', {}, ""],
+            'filter-syntax20': ['{{ ""|defaultifnull:"was none" }}', {}, ""],
 
             'filter-syntax20a': ['{{ emptystring|defaultifnull:"was none" }}', {emptystring: ""}, ""],
 
@@ -371,7 +370,7 @@ exports.testBasic = function() {
             'ifequal-split06': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i "love" you'}, "yes"],
             'ifequal-split07': ["{% ifequal a 'i \"love\" you' %}yes{% else %}no{% endifequal %}", {'a': 'i love you'}, "no"],
             // FIXME probably regex broken for those weird cases
-            // 'ifequal-split08': ["{% ifequal a 'I\'m happy' %}yes{% else %}no{% endifequal %}", {'a': "I'm happy"}, "yes"],
+            //'ifequal-split08': ["{% ifequal a 'I\'m happy' %}yes{% else %}no{% endifequal %}", {'a': "I'm happy"}, "yes"],
             //'ifequal-split09': ["{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': "slash\man"}, "yes"],
             //'ifequal-split10': ["{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': "slashman"}, "no"],
 
@@ -539,7 +538,7 @@ exports.testBasic = function() {
 
             //Expression starting and ending with a quote
             // FIXME regex problem
-            // 'inheritance42': ["{% extends 'inheritance02'|cut:' ' %}", {}, '1234'],
+            //'inheritance42': ["{% extends 'inheritance02'|cut:' ' %}", {}, '1234'],
 
 
             //Raise exception for invalid template name
@@ -576,8 +575,7 @@ exports.testBasic = function() {
             'if-tag-eq02': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1}, "no"],
             'if-tag-eq03': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'bar': 1}, "yes"],
             'if-tag-eq04': ["{% if foo == bar %}yes{% else %}no{% endif %}", {'foo': 1, 'bar': 2}, "no"],
-            // FIXME regex problem
-            // 'if-tag-eq05': ["{% if foo == '' %}yes{% else %}no{% endif %}", {}, "no"],
+            'if-tag-eq05': ["{% if foo == '' %}yes{% else %}no{% endif %}", {}, "no"],
 
             //Comparison
             'if-tag-gt-01': ["{% if 2 > 1 %}yes{% else %}no{% endif %}", {}, "yes"],
@@ -683,6 +681,12 @@ exports.testBasic = function() {
             'if-tag-badarg02':["{% if x|default:y %}yes{% endif %}", {'y': 0}, ''],
             'if-tag-badarg03':["{% if x|default:y %}yes{% endif %}", {'y': 1}, 'yes'],
             'if-tag-badarg04':["{% if x|default:y %}yes{% else %}no{% endif %}", {}, 'no'],
+
+            // constants can be single- or double-quoted strings
+            // or numbers with optional +/- prefix
+            'constant-regex01': ['{{ "foobar"|upper}}', {}, 'FOOBAR'],
+            'constant-regex02': ["{{ 'foobar'|upper}}", {}, 'FOOBAR'],
+            'constant-regex03': ["{{ list|join:' '}}", {list: [1,2]}, "1 2"],
       };
 
       for (var key in tests) {

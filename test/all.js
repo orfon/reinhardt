@@ -1,11 +1,12 @@
+exports.testBasic = require('./basic');
 exports.testContext = require('./context');
-exports.variable = require('./variable');
 exports.testFilterExpression = require('./filterexpression');
+exports.testFilters = require('./filters');
 exports.testLexer = require('./lexer');
 exports.testNodeList = require('./nodelist');
+exports.testSmartIf = require('./smartif');
 exports.testTemplate = require('./template');
-exports.testBasic = require('./basic');
-exports.testFilters = require('./filters');
+exports.testVariable = require('./variable');
 
 // start the test runner if we're called directly from command line
 if (require.main == module.id) {

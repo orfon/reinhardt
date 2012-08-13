@@ -688,6 +688,36 @@ exports.testBasic = function() {
             'constant-regex02': ["{{ 'foobar'|upper}}", {}, 'FOOBAR'],
             'constant-regex03': ["{{ list|join:' '}}", {list: [1,2]}, "1 2"],
             'constant-regex04': ["{{ list|join:''}}", {list: [1,2]}, "12"],
+
+
+            //CYCLE TAG #############################################################
+            'cycle01': ['{% cycle a %}', {}, Error],
+            'cycle02': ['{% cycle a,b,c as abc %}{% cycle abc %}', {}, 'ab'],
+            'cycle03': ['{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}', {}, 'abc'],
+            'cycle04': ['{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}', {}, 'abca'],
+            'cycle05': ['{% cycle %}', {}, Error],
+            'cycle06': ['{% cycle a %}', {}, Error],
+            'cycle07': ['{% cycle a,b,c as foo %}{% cycle bar %}', {}, Error],
+            'cycle08': ['{% cycle a,b,c as foo %}{% cycle foo %}{{ foo }}{{ foo }}{% cycle foo %}{{ foo }}', {}, 'abbbcc'],
+            'cycle09': ["{% for i in test %}{% cycle a,b %}{{ i }},{% endfor %}", {'test': [0,1,2,3,4]}, 'a0,b1,a2,b3,a4,'],
+            'cycle10': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}", {}, 'ab'],
+            'cycle11': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}", {}, 'abc'],
+            'cycle12': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, 'abca'],
+            'cycle13': ["{% for i in test %}{% cycle 'a' 'b' %}{{ i }},{% endfor %}", {'test': [0,1,2,3,4]}, 'a0,b1,a2,b3,a4,'],
+            'cycle14': ["{% cycle one two as foo %}{% cycle foo %}", {'one': '1','two': '2'}, '12'],
+            'cycle15': ["{% for i in test %}{% cycle aye bee %}{{ i }},{% endfor %}", {'test': [0,1,2,3,4], 'aye': 'a', 'bee': 'b'}, 'a0,b1,a2,b3,a4,'],
+            'cycle16': ["{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A','two': '2'}, 'a2'],
+            'cycle17': ["{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""],
+            'cycle18': ["{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, Error],
+            'cycle19': ["{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"],
+            'cycle20': ["{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A & B &amp; C & D"],
+            //'cycle21': ["{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"],
+            'cycle22': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "1234"],
+            'cycle23': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"],
+            'included-cycle': ['{{ abc }}', {'abc': 'xxx'}, 'xxx'],
+            'cycle24': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"],
+            'cycle25': ["{% cycle a,b,c as bar %}{% cycle 1,2,3 as foo %}{% cycle bar %}{% cycle foo %}{% cycle bar %}{% cycle foo %}", {}, "a1b2c3"]
+
       };
 
       for (var key in tests) {
@@ -723,33 +753,6 @@ if (require.main == module.id) {
             //propagates
             // FIXME 'filter-syntax23': ['1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
             // FIXME  'filter-syntax24': ['1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)],
-
-            //CYCLE TAG #############################################################
-            'cycle01': ['{% cycle a %}', {}, Error],
-            'cycle02': ['{% cycle a,b,c as abc %}{% cycle abc %}', {}, 'ab'],
-            'cycle03': ['{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}', {}, 'abc'],
-            'cycle04': ['{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}', {}, 'abca'],
-            'cycle05': ['{% cycle %}', {}, Error],
-            'cycle06': ['{% cycle a %}', {}, Error],
-            'cycle07': ['{% cycle a,b,c as foo %}{% cycle bar %}', {}, Error],
-            'cycle08': ['{% cycle a,b,c as foo %}{% cycle foo %}{{ foo }}{{ foo }}{% cycle foo %}{{ foo }}', {}, 'abbbcc'],
-            'cycle09': ["{% for i in test %}{% cycle a,b %}{{ i }},{% endfor %}", {'test': range(5)}, 'a0,b1,a2,b3,a4,'],
-            'cycle10': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}", {}, 'ab'],
-            'cycle11': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}", {}, 'abc'],
-            'cycle12': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, 'abca'],
-            'cycle13': ["{% for i in test %}{% cycle 'a' 'b' %}{{ i }},{% endfor %}", {'test': range(5)}, 'a0,b1,a2,b3,a4,'],
-            'cycle14': ["{% cycle one two as foo %}{% cycle foo %}", {'one': '1','two': '2'}, '12'],
-            'cycle15': ["{% for i in test %}{% cycle aye bee %}{{ i }},{% endfor %}", {'test': range(5], 'aye': 'a', 'bee': 'b'}, 'a0,b1,a2,b3,a4,'],
-            'cycle16': ["{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A','two': '2'}, 'a2'],
-            'cycle17': ["{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""],
-            'cycle18': ["{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, Error],
-            'cycle19': ["{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"],
-            'cycle20': ["{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A & B &amp; C & D"],
-            'cycle21': ["{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"],
-            'cycle22': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "1234"],
-            'cycle23': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"],
-            'included-cycle': ['{{ abc }}', {'abc': 'xxx'}, 'xxx'],
-            'cycle24': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"],
 
             //EXCEPTIONS ############################################################
 

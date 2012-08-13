@@ -14,7 +14,7 @@ Implemented filters and tags
 | Implemented |     Tag     |
 |      X      | block       |
 |      X      | comment     |
-|             | cycle       |
+|      X      | cycle       |
 |             | debug       |
 |      X      | extends     |
 |      X      | filter      |

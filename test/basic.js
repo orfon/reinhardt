@@ -687,6 +687,7 @@ exports.testBasic = function() {
             'constant-regex01': ['{{ "foobar"|upper}}', {}, 'FOOBAR'],
             'constant-regex02': ["{{ 'foobar'|upper}}", {}, 'FOOBAR'],
             'constant-regex03': ["{{ list|join:' '}}", {list: [1,2]}, "1 2"],
+            'constant-regex04': ["{{ list|join:''}}", {list: [1,2]}, "12"],
       };
 
       for (var key in tests) {

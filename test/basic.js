@@ -2,6 +2,7 @@ var assert = require("assert");
 
 var {Template} = require('../lib/template');
 var {Context} = require('../lib/context');
+var {markSafe} = require('../lib/utils');
 
 /**
  * Utility classes
@@ -777,6 +778,54 @@ exports.testBasic = function() {
             'spaceless04': ["{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}", {'text' : 'This & that'}, "<b><i>This &amp; that</i></b>"],
             'spaceless05': ["{% autoescape off %}{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}{% endautoescape %}", {'text' : 'This & that'}, "<b><i>This & that</i></b>"],
             'spaceless06': ["{% spaceless %}<b>   <i>{{ text|safe }}</i>  </b>{% endspaceless %}", {'text' : 'This & that'}, "<b><i>This & that</i></b>"],
+
+            ///// AUTOESCAPE TAG ##############################################
+            'autoescape-tag01': ["{% autoescape off %}hello{% endautoescape %}", {}, "hello"],
+            'autoescape-tag02': ["{% autoescape off %}{{ first }}{% endautoescape %}", {"first": "<b>hello</b>"}, "<b>hello</b>"],
+            'autoescape-tag03': ["{% autoescape on %}{{ first }}{% endautoescape %}", {"first": "<b>hello</b>"}, "&lt;b&gt;hello&lt;/b&gt;"],
+
+            // Autoescape disabling and enabling nest in a predictable way.
+            'autoescape-tag04': ["{% autoescape off %}{{ first }} {% autoescape  on%}{{ first }}{% endautoescape %}{% endautoescape %}", {"first": "<a>"}, "<a> &lt;a&gt;"],
+
+            'autoescape-tag05': ["{% autoescape on %}{{ first }}{% endautoescape %}", {"first": "<b>first</b>"}, "&lt;b&gt;first&lt;/b&gt;"],
+
+            // Strings (ASCII or unicode) already marked as "safe" are not
+            // auto-escaped
+            'autoescape-tag06': ["{{ first }}", {"first": markSafe("<b>first</b>")}, "<b>first</b>"],
+            'autoescape-tag07': ["{% autoescape on %}{{ first }}{% endautoescape %}", {"first": markSafe("<b>Apple</b>")}, "<b>Apple</b>"],
+
+            // Literal string arguments to filters, if used in the result, are
+            // safe.
+            // FIXME regex?
+            // 'autoescape-tag08': ['{% autoescape on %}{{ var|defaultifnull:" endquote\" hah" }}{% endautoescape %}', {"var": null}, ' endquote" hah'],
+
+            // Objects which return safe strings as their __unicode__ method
+            // won't get double-escaped.
+            'autoescape-tag09': ['{{ unsafe }}', {'unsafe': 'you & me'}, 'you &amp; me'],
+            'autoescape-tag10': ['{{ safe }}', {'safe': markSafe('you &gt; me')}, 'you &gt; me'],
+
+            // The "safe" and "escape" filters cannot work due to internal
+            // implementation details (fortunately, the (no)autoescape block
+            // tags can be used in those cases)
+            // FIXME see fixme in autoescpe tag
+            // 'autoescape-filtertag01': ["{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, Error],
+
+            // ifqeual compares unescaped vales.
+            'autoescape-ifequal01': ['{% ifequal var "this & that" %}yes{% endifequal %}', { "var": "this & that" }, "yes"],
+
+            // Arguments to filters are 'safe' and manipulate their input unescaped.
+            'autoescape-filters01': ['{{ var|cut:"&" }}', { "var": "this & that" }, "this  that" ],
+            'autoescape-filters02': ['{{ var|join:" & \" }}', { "var": ["Tom", "Dick", "Harry"] }, "Tom & Dick & Harry"],
+
+            // Literal strings are safe.
+            'autoescape-literals01': ['{{ "this & that" }}',{}, "this & that"],
+
+            // Iterating over strings outputs safe characters.
+            'autoescape-stringiterations01': ['{% for l in var %}{{ l }},{% endfor %}', {'var': 'K&R'}, "K,&amp;,R,"],
+
+            // Escape requirement survives lookup.
+            'autoescape-lookup01': ['{{ var.key }}', { "var": {"key": "this & that" }}, "this &amp; that"],
+
 
       };
 

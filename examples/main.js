@@ -17,7 +17,7 @@ exports.app = function(req) {
 
 if (require.main == module) {
    var {Loader} = require('reinhardt/loaders/filesystem');
-   var templateLoader = new Loader([module.resolve('./templates/'), module.resolve('./templates2')]);
+   var templateLoader = new Loader(module.resolve('./templates/'), module.resolve('./templates2'));
    require('reinhardt').registerLoader(templateLoader);
 
    require("ringo/httpserver").main(module.id);

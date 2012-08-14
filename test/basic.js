@@ -834,6 +834,20 @@ exports.testBasic = function() {
             'verbatim-tag05': ['{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}', {}, ''],
             'verbatim-tag06': ["{% verbatim special %}Don't {% endverbatim %} just yet{% endverbatim special %}", {}, "Don't {% endverbatim %} just yet"],
 
+            // WITH TAG ########################################################
+            'with01': ['{% with key=dict.key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'],
+            // WONTFIX no legacy support
+            // 'legacywith01': ['{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'],
+
+            'with02': ['{{ key }}{% with key=dict.key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, 'INVALID50-50-50INVALID'],
+            // WONTFIX not legacy support
+            // 'legacywith02': ['{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, 'INVALID50-50-50INVALID'],
+
+            'with03': ['{% with a=alpha b=beta %}{{ a }}{{ b }}{% endwith %}', {'alpha': 'A', 'beta': 'B'}, 'AB'],
+
+            'with-error01': ['{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, Error],
+            'with-error02': ['{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, Error],
+
       };
 
       for (var key in tests) {

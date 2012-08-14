@@ -751,6 +751,12 @@ exports.testBasic = function() {
 
             'ifchanged-else04': ['{% for id in ids %}{% ifchanged %}***{{ id }}*{% else %}...{% endifchanged %}{{ forloop.counter }}{% endfor %}', {'ids': [1,1,2,2,2,3,4]}, '***1*1...2***2*3...4...5***3*6***4*7'],
 
+            //FILTER TAG ############################################################
+            'filter01': ['{% filter upper %}{% endfilter %}', {}, ''],
+            'filter02': ['{% filter upper %}django{% endfilter %}', {}, 'DJANGO'],
+            'filter03': ['{% filter upper|lower %}django{% endfilter %}', {}, 'django'],
+            'filter04': ['{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'],
+
 
       };
 
@@ -793,12 +799,6 @@ if (require.main == module.id) {
 
             //Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ["{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, Error],
-
-            //FILTER TAG ############################################################
-            'filter01': ['{% filter upper %}{% endfilter %}', {}, ''],
-            'filter02': ['{% filter upper %}django{% endfilter %}', {}, 'DJANGO'],
-            'filter03': ['{% filter upper|lower %}django{% endfilter %}', {}, 'django'],
-            'filter04': ['{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'],
 
             //FIRSTOF TAG ###########################################################
             'firstof01': ['{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''],

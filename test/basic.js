@@ -770,6 +770,14 @@ exports.testBasic = function() {
             'firstof10': ['{% firstof a %}', {'a': '<'}, '<'], //Variables are NOT auto-escaped.
 
 
+            // {% spaceless %} tag
+            'spaceless01': ["{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b><i> text </i></b>"],
+            'spaceless02': ["{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b><i> text </i></b>"],
+            'spaceless03': ["{% spaceless %}<b><i>text</i></b>{% endspaceless %}", {}, "<b><i>text</i></b>"],
+            'spaceless04': ["{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}", {'text' : 'This & that'}, "<b><i>This &amp; that</i></b>"],
+            'spaceless05': ["{% autoescape off %}{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}{% endautoescape %}", {'text' : 'This & that'}, "<b><i>This & that</i></b>"],
+            'spaceless06': ["{% spaceless %}<b>   <i>{{ text|safe }}</i>  </b>{% endspaceless %}", {'text' : 'This & that'}, "<b><i>This & that</i></b>"],
+
       };
 
       for (var key in tests) {

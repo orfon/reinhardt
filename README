@@ -18,7 +18,7 @@ Implemented filters and tags
 |             | debug       |
 |      X      | extends     |
 |      X      | filter      |
-|             | firstof     |
+|      X      | firstof     |
 |      X      | for         |
 |      X      | if          |
 |      X      | ifchanged   |
@@ -28,7 +28,7 @@ Implemented filters and tags
 |             | load        |
 |             | now         |
 |             | regroup     |
-|             | spaceless   |
+|      X      | spaceless   |
 |             | ssi         |
 |             | templatetag |
 |     N/A     | url         |

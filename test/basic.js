@@ -826,6 +826,13 @@ exports.testBasic = function() {
             // Escape requirement survives lookup.
             'autoescape-lookup01': ['{{ var.key }}', { "var": {"key": "this & that" }}, "this &amp; that"],
 
+            // Verbatim template tag outputs contents without rendering.
+            'verbatim-tag01': ['{% verbatim %}{{bare   }}{% endverbatim %}', {}, '{{bare   }}'],
+            'verbatim-tag02': ['{% verbatim %}{% endif %}{% endverbatim %}', {}, '{% endif %}'],
+            'verbatim-tag03': ["{% verbatim %}It's the {% verbatim %} tag{% endverbatim %}", {}, "It's the {% verbatim %} tag"],
+            'verbatim-tag04': ['{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}', {}, Error],
+            'verbatim-tag05': ['{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}', {}, ''],
+            'verbatim-tag06': ["{% verbatim special %}Don't {% endverbatim %} just yet{% endverbatim special %}", {}, "Don't {% endverbatim %} just yet"],
 
       };
 

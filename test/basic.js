@@ -757,6 +757,18 @@ exports.testBasic = function() {
             'filter03': ['{% filter upper|lower %}django{% endfilter %}', {}, 'django'],
             'filter04': ['{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'],
 
+            //FIRSTOF TAG ###########################################################
+            'firstof01': ['{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''],
+            'firstof02': ['{% firstof a b c %}', {'a':1,'b':0,'c':0}, '1'],
+            'firstof03': ['{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'],
+            'firstof04': ['{% firstof a b c %}', {'a':0,'b':0,'c':3}, '3'],
+            'firstof05': ['{% firstof a b c %}', {'a':1,'b':2,'c':3}, '1'],
+            'firstof06': ['{% firstof a b c %}', {'b':0,'c':3}, '3'],
+            'firstof07': ['{% firstof a b "c" %}', {'a':0}, 'c'],
+            'firstof08': ['{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'],
+            'firstof09': ['{% firstof %}', {}, Error],
+            'firstof10': ['{% firstof a %}', {'a': '<'}, '<'], //Variables are NOT auto-escaped.
+
 
       };
 
@@ -799,19 +811,6 @@ if (require.main == module.id) {
 
             //Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ["{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, Error],
-
-            //FIRSTOF TAG ###########################################################
-            'firstof01': ['{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''],
-            'firstof02': ['{% firstof a b c %}', {'a':1,'b':0,'c':0}, '1'],
-            'firstof03': ['{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'],
-            'firstof04': ['{% firstof a b c %}', {'a':0,'b':0,'c':3}, '3'],
-            'firstof05': ['{% firstof a b c %}', {'a':1,'b':2,'c':3}, '1'],
-            'firstof06': ['{% firstof a b c %}', {'b':0,'c':3}, '3'],
-            'firstof07': ['{% firstof a b "c" %}', {'a':0}, 'c'],
-            'firstof08': ['{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'],
-            'firstof09': ['{% firstof %}', {}, Error],
-            'firstof10': ['{% firstof a %}', {'a': '<'}, '<'], //Variables are NOT auto-escaped.
-
 
             //Additional, more precise parsing tests are in SmartIfTests
 

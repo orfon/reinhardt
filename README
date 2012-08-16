@@ -45,7 +45,7 @@ Implemented filters and tags
 |      X      | capfirst           |
 |      X      | center             |
 |      X      | cut                |
-|             | date               |
+|      X      | date               |
 |      X      | default            |
 |     N/A     | default_if_none    |
 |     NEW     | defaultifnull

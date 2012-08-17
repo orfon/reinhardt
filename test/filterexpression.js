@@ -50,7 +50,7 @@ exports.testParsing = function() {
    var date = new Date();
    date.setYear(1910);
    var c = {'django': {'birthday': date}};
-   var fe = new FilterExpression('django.birthday|dateFormat:"yyyy"', parser);
+   var fe = new FilterExpression('django.birthday|date:"yyyy"', parser);
    assert.equal(fe.resolve(c), 1910);
 }
 

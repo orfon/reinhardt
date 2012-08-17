@@ -7,7 +7,7 @@ var templateString = "<html>\n\
             {% ifequal user.name 'Django' %} \n\
             {{'Its really him!!'|upper}} \n\
             {% else %} \n\
-            {{foo.bar|dateFormat:'yyyy'}} \n\
+            {{foo.bar|date:'yyyy'}} \n\
             {% endifequal %}\n\
             </html>";
 var renderedString = "<html>\n\

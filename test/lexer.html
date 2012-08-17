@@ -8,7 +8,7 @@
 {{author.name|upper}}
 
 {% block content %}
-<p>In {{ hour_offset|dateFormat:"yyyy" }} hour(s), it will be {{ next_time }}.</p>
+<p>In {{ hour_offset|date:"yyyy" }} hour(s), it will be {{ next_time }}.</p>
 {% endblock %}
 
 </body>

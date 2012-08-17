@@ -28,7 +28,9 @@ Implemented filters and tags
 |      X      | ifequal     |
 |      X      | ifnotequal  |
 |      X      | include     |
-|             | load        |
+|     NEW     | loadfilter  |
+|     NEW     | loadtag     |
+|     N/A     | load        |
 |             | now         |
 |             | regroup     |
 |      X      | spaceless   |

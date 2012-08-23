@@ -473,13 +473,13 @@ exports.testBasic = function() {
 
             //{% load %} tag (parent -- setup for exception04)
             // NOTE: in a normal environment tags are loaded from packages not with weird relative paths
-            'inheritance17': ["{% loadtag ../../test/fakepackage/tags %}{% block first %}1234{% endblock %}", {}, '1234'],
+            'inheritance17': ["{% loadtag ./fakepackage/tags %}{% block first %}1234{% endblock %}", {}, '1234'],
 
             //{% load %} tag (standard usage, without inheritance)
-            'inheritance18': ["{% loadtag ../../test/fakepackage/tags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
+            'inheritance18': ["{% loadtag ./fakepackage/tags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
 
             //{% load %} tag (within a child template)
-            'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% loadtag ../../test/fakepackage/tags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
+            'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% loadtag ./fakepackage/tags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
 
             //Two-level inheritance with {{ block.super }}
             'inheritance20': ["{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'],
@@ -849,19 +849,19 @@ exports.testBasic = function() {
             'with-error02': ['{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, Error],
 
             //LOADING TAG LIBRARIES #################################################
-            'load01': ["{% loadtag ../../test/fakepackage/tags %}{% echo test %} {% echo2 test %}", {}, "test test"],
+            'load01': ["{% loadtag ./fakepackage/tags %}{% echo test %} {% echo2 test %}", {}, "test test"],
             // ??
             // 'load02': ["{% load subpackage.echo %}{% echo2 \"test\" %}", {}, "test"],
 
             //{% load %} tag, importing individual tags
-            'load03': ["{% loadtag echo from ../../test/fakepackage/tags %}{% echo this that theother %}", {}, 'this that theother'],
-            'load04': ["{% loadtag echo other_echo from ../../test/fakepackage/tags %}{% echo this that theother %} {% other_echo and another thing %}", {}, 'this that theother and another thing'],
+            'load03': ["{% loadtag echo from ./fakepackage/tags %}{% echo this that theother %}", {}, 'this that theother'],
+            'load04': ["{% loadtag echo other_echo from ./fakepackage/tags %}{% echo this that theother %} {% other_echo and another thing %}", {}, 'this that theother and another thing'],
             // different from django: either filter or tag
-            'load05': ["{% loadfilter upper from ../../test/fakepackage/filters %}{{ statement|upper }}", {'statement': 'not shouting'}, 'NOT SHOUTING'],
+            'load05': ["{% loadfilter upper from ./fakepackage/filters %}{{ statement|upper }}", {'statement': 'not shouting'}, 'NOT SHOUTING'],
 
             //{% load %} tag errors
-            'load09': ["{% loadtag from ../../test/fakepackage/tags %}", {}, Error],
-            'load09b': ["{% loadfilter from ../../test/fakepackage/tags %}", {}, Error],
+            'load09': ["{% loadtag from ./fakepackage/tags %}", {}, Error],
+            'load09b': ["{% loadfilter from ./fakepackage/tags %}", {}, Error],
             'load10': ["{% loadtag echo from bad_library %}", {}, Error],
             'load11': ["{% loadfilter echo from bad_library %}", {}, Error],
 

@@ -1,5 +1,5 @@
 {
-    "name": "ringo-sqlstore",
+    "name": "reinhardt",
     "version": "0.1",
     "description": "Django templates for JavaScript",
     "keywords": ["template"],
@@ -17,7 +17,7 @@
     }],
     "repositories": [{
         "type": "git",
-        "url": "https://github.com/grob/ringo-sqlstore.git"
+        "url": "https://github.com/oberhamsi/reinhardt.git"
     }],
     "engines": {
         "ringojs": ">= 0.8"

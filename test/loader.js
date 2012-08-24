@@ -27,7 +27,7 @@ var MockLoader = function() {
    return this;
 }
 
-var c = new Context({});
+var c = {};
 
 exports.testLoaderOrderA = function() {
    var FsLoader = require('../lib/loaders/filesystem').Loader;

@@ -44,6 +44,7 @@ Implemented filters and tags
 | Implemented | Filter             |
 |             | add                |
 |      X      | addslashes         |
+|     NEW     | byKey              |
 |      X      | capfirst           |
 |      X      | center             |
 |      X      | cut                |
@@ -62,6 +63,7 @@ Implemented filters and tags
 |             | get_digit          |
 |             | iriencode          |
 |      X      | join               |
+|     NEW     | key                |
 |      X      | length             |
 |      X      | length_is          |
 |      X      | linebreaks         |

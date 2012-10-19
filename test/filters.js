@@ -236,6 +236,8 @@ exports.testFilters = function() {
         'filter-removetags01': ['{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}', {"a": "<a>x</a> <p><b>y</b></p>", "b": markSafe("<a>x</a> <p><b>y</b></p>")}, "x &lt;p&gt;y&lt;/p&gt; x <p>y</p>"],
         'filter-removetags02': ['{% autoescape off %}{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}{% endautoescape %}', {"a": "<a>x</a> <p><b>y</b></p>", "b": markSafe("<a>x</a> <p><b>y</b></p>")}, "x <p>y</p> x <p>y</p>"],
 
+        'filter-keys': ['{% for key in obj|keys %} {{key}} {{obj|byKey:key}} {% endfor %}', {"obj": {"a": 1, "b": 2, "c": 3}}, " a 1  b 2  c 3 "],
+        'filter-keys': ['{% for key in obj|keys %} {{key}} {{obj|byKey:key}} {% endfor %}', {"obj": [11,22,33,44]}, " 0 11  1 22  2 33  3 44 "]
 
     };
 

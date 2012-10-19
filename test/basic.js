@@ -865,6 +865,34 @@ exports.testBasic = function() {
             'load10': ["{% loadtag echo from bad_library %}", {}, Error],
             'load11': ["{% loadfilter echo from bad_library %}", {}, Error],
 
+            // WIDTHRATIO TAG ########################################################
+            'widthratio01': ['{% widthratio a b 0 %}', {'a':50,'b':100}, '0'],
+            'widthratio02': ['{% widthratio a b 100 %}', {'a':0,'b':0}, '0'],
+            'widthratio03': ['{% widthratio a b 100 %}', {'a':0,'b':100}, '0'],
+            'widthratio04': ['{% widthratio a b 100 %}', {'a':50,'b':100}, '50'],
+            'widthratio05': ['{% widthratio a b 100 %}', {'a':100,'b':100}, '100'],
+
+            // 62.5 will round down to 62
+            'widthratio06': ['{% widthratio a b 100 %}', {'a':50,'b':80}, '62'],
+
+            // 71.4 should round to 71
+            'widthratio07': ['{% widthratio a b 100 %}', {'a':50,'b':70}, '71'],
+
+            // Raise exception if we don't have 3 args, last one an integer
+            'widthratio08': ['{% widthratio %}', {}, Error],
+            'widthratio09': ['{% widthratio a b %}', {'a':50,'b':100}, Error],
+            'widthratio10': ['{% widthratio a b 100.0 %}', {'a':50,'b':100}, '50'],
+
+            // #10043: widthratio should allow max_width to be a variable
+            'widthratio11': ['{% widthratio a b c %}', {'a':50,'b':100, 'c': 100}, '50'],
+
+            // #18739: widthratio should handle None args consistently with non-numerics
+            'widthratio12a': ['{% widthratio a b c %}', {'a':'a','b':100,'c':100}, ''],
+            'widthratio12b': ['{% widthratio a b c %}', {'a':null,'b':100,'c':100}, ''],
+            'widthratio13a': ['{% widthratio a b c %}', {'a':0,'b':'b','c':100}, ''],
+            'widthratio13b': ['{% widthratio a b c %}', {'a':0,'b':null,'c':100}, ''],
+            'widthratio14a': ['{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, Error],
+            'widthratio14b': ['{% widthratio a b c %}', {'a':0,'b':100,'c':null}, Error],
       };
 
       for (var key in tests) {

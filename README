@@ -38,7 +38,7 @@ Implemented filters and tags
 |             | templatetag |
 |     N/A     | url         |
 |      X      | verbatim    |
-|             | widthratio  |
+|      X      | widthratio  |
 |      X      | with        |
 
 | Implemented | Filter             |

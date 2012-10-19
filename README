@@ -52,8 +52,8 @@ Implemented filters and tags
 |      X      | default            |
 |     N/A     | default_if_none    |
 |     NEW     | defaultifnull
-|             | dictsort           |
-|             | dictsort_reversed  |
+|     N/A     | dictsort           |
+|     N/A     | dictsort_reversed  |
 |             | divisibleby        |
 |      X      | escape             |
 |             | filesizeformat     |
@@ -82,6 +82,7 @@ Implemented filters and tags
 |             | safeseq            |
 |      X      | slice              |
 |      X      | slugify            |
+|     NEW     | sortByKey          |
 |      X      | stringformat       |
 |      X      | striptags          |
 |             | time               |

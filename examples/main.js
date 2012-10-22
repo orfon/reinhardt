@@ -1,4 +1,4 @@
-var {renderResponse} = require('reinhardt');
+var {Environment} = require('reinhardt');
 
 var context = {
    links: [
@@ -10,15 +10,18 @@ var context = {
    djangoImage: require('ringo/base64').encode(require('fs').read(module.resolve('./static/django-reinhardt.jpg'), {binary: true}))
 }
 
+var env = module.singleton('env', function() {
+   return new Environment({
+      loader: [module.resolve('./templates/'), module.resolve('./templates2')],
+   })
+});
+
 exports.app = function(req) {
    var templateName = req.pathInfo.split('/').slice(1)[0] || 'base.html';
-   return renderResponse(templateName, context);
+   return env.renderResponse(templateName, context);
 };
 
 if (require.main == module) {
    var {Loader} = require('reinhardt/loaders/filesystem');
-   var templateLoader = new Loader(module.resolve('./templates/'), module.resolve('./templates2'));
-   require('reinhardt').registerLoader(templateLoader);
-
    require("ringo/httpserver").main(module.id);
 }

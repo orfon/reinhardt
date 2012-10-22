@@ -1,10 +1,6 @@
 var assert = require('assert');
-var loader = require('../lib/loader');
 var {Context} = require('../lib/context');
-
-exports.tearDown = function() {
-   loader.reset();
-}
+var {Environment} = require('../lib/environment');
 
 var MockLoader = function() {
    this.templateAccess = {
@@ -31,18 +27,18 @@ var c = {};
 
 exports.testLoaderOrderA = function() {
    var FsLoader = require('../lib/loaders/filesystem').Loader;
-   var fsReader = new FsLoader(module.resolve('./templatedir/bar/'),
+   var fsLoader = new FsLoader(module.resolve('./templatedir/bar/'),
                                module.resolve('./templatedir/foo/'));
-   loader.register(fsReader);
-   assert.equal(loader.getTemplate('test.html').render(c), 'bar');
-   assert.equal(loader.getTemplate('baz/test.html').render(c), 'baz');
+   var env = new Environment({loader: fsLoader});
+   assert.equal(env.getTemplate('test.html').render(c), 'bar');
+   assert.equal(env.getTemplate('baz/test.html').render(c), 'baz');
 }
 
 exports.testLoaderOrderB = function() {
    var FsLoader = require('../lib/loaders/filesystem').Loader;
    var fsLoader = new FsLoader(module.resolve('./templatedir/foo/'),
                                module.resolve('./templatedir/bar/'));
-   loader.register(fsLoader);
+   var env = new Environment({loader: fsLoader});
    assert.equal(loader.getTemplate('test.html').render(c), 'foo');
    assert.equal(loader.getTemplate('baz/test.html').render(c), 'baz');
 }
@@ -54,7 +50,8 @@ exports.testCachedLoader = function() {
                               module.resolve('./templatedir/bar/'));
    var CachedLoader = require('../lib/loaders/cached').Loader;
    var cachedLoader = new CachedLoader(fsLoader)
-   loader.register(cachedLoader);
+
+   var env = new Environment({loader: cachedLoader});
    assert.equal(loader.getTemplate('test.html').render(c), 'foo');
    assert.equal(loader.getTemplate('baz/test.html').render(c), 'baz');
 }
@@ -64,7 +61,8 @@ exports.testCacheLoaderCaching = function() {
    var mockLoader = new MockLoader();
    var CachedLoader = require('../lib/loaders/cached').Loader;
    var cachedLoader = new CachedLoader(mockLoader);
-   loader.register(cachedLoader);
+
+   var env = new Environment({loader: cachedLoader});
    assert.equal(loader.getTemplate('foo').render(c), 'foo');
    // one access to foo template
    assert.equal(mockLoader.templateAccess.foo, 1);
@@ -76,10 +74,7 @@ exports.testCacheLoaderCaching = function() {
    assert.equal(loader.getTemplate('bar').render(c), 'bar');
    assert.equal(loader.getTemplate('bar').render(c), 'bar');
    assert.equal(mockLoader.templateAccess.bar, 1);
-   // unless we call reset
-   cachedLoader.reset();
-   assert.equal(loader.getTemplate('bar').render(c), 'bar');
-   assert.equal(mockLoader.templateAccess.bar, 2);
+
 }
 
 //start the test runner if we're called directly from command line

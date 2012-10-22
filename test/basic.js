@@ -3,7 +3,7 @@ var assert = require("assert");
 var {Template} = require('../lib/template');
 var {Context} = require('../lib/context');
 var {markSafe} = require('../lib/utils');
-
+var {Environment} = require('../lib/environment');
 /**
  * Utility classes
  */
@@ -55,7 +55,7 @@ exports.testBasic = function() {
             }
             return this;
       }
-      require('../lib/loader').register(new TestTemplateLoader());
+      var env = new Environment({loader: new TestTemplateLoader()})
 
       // 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
       var tests = {
@@ -900,14 +900,14 @@ exports.testBasic = function() {
             print (key);
             if (test[2] == Error) {
                   assert.throws(function() {
-                              var t = new Template(test[0]);
+                              var t = env.getTemplate(key);
                               t.render(new Context(test[1]));
                         },
                         test[2],
                         key
                   );
             } else {
-                  var template = new Template(test[0]);
+                  var template = env.getTemplate(key);
                   assert.strictEqual(template.render(new Context(test[1])), test[2], key);
             }
       }

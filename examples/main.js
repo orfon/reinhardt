@@ -10,10 +10,8 @@ var context = {
    djangoImage: require('ringo/base64').encode(require('fs').read(module.resolve('./static/django-reinhardt.jpg'), {binary: true}))
 }
 
-var env = module.singleton('env', function() {
-   return new Environment({
-      loader: [module.resolve('./templates/'), module.resolve('./templates2')],
-   })
+var env = new Environment({
+   loader: [module.resolve('./templates/'), module.resolve('./templates2')],
 });
 
 exports.app = function(req) {

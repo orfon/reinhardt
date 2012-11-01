@@ -102,18 +102,6 @@ Implemented filters and tags
 |      X      | yesno              |
 
 
-Urgent Todos
-================
-
- * Missing {% load %}
-  *  {% loadfilter packageFoo.filters %}
-  * {% loadfilter filterBar from packageFoo.filters %}
-  * same for {% loadtag .. %}
- * improve the FilterExpression RegEx
-  * the correct regex in django: <https://github.com/django/django/blob/master/django/template/base.py#L481-513>
-  * my regex still fails for some edge cases (see unit tests)
-
-
 About the code
 ===============
 

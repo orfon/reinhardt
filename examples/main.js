@@ -20,6 +20,5 @@ exports.app = function(req) {
 };
 
 if (require.main == module) {
-   var {Loader} = require('reinhardt/loaders/filesystem');
    require("ringo/httpserver").main(module.id);
 }

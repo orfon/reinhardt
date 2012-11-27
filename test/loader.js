@@ -39,8 +39,8 @@ exports.testLoaderOrderB = function() {
    var fsLoader = new FsLoader(module.resolve('./templatedir/foo/'),
                                module.resolve('./templatedir/bar/'));
    var env = new Environment({loader: fsLoader});
-   assert.equal(loader.getTemplate('test.html').render(c), 'foo');
-   assert.equal(loader.getTemplate('baz/test.html').render(c), 'baz');
+   assert.equal(env.getTemplate('test.html').render(c), 'foo');
+   assert.equal(env.getTemplate('baz/test.html').render(c), 'baz');
 }
 
 // does it return the same as raw filesystem loader?
@@ -52,8 +52,8 @@ exports.testCachedLoader = function() {
    var cachedLoader = new CachedLoader(fsLoader)
 
    var env = new Environment({loader: cachedLoader});
-   assert.equal(loader.getTemplate('test.html').render(c), 'foo');
-   assert.equal(loader.getTemplate('baz/test.html').render(c), 'baz');
+   assert.equal(env.getTemplate('test.html').render(c), 'foo');
+   assert.equal(env.getTemplate('baz/test.html').render(c), 'baz');
 }
 
 // does it cache?
@@ -63,16 +63,16 @@ exports.testCacheLoaderCaching = function() {
    var cachedLoader = new CachedLoader(mockLoader);
 
    var env = new Environment({loader: cachedLoader});
-   assert.equal(loader.getTemplate('foo').render(c), 'foo');
+   assert.equal(env.getTemplate('foo').render(c), 'foo');
    // one access to foo template
    assert.equal(mockLoader.templateAccess.foo, 1);
    // try again
-   assert.equal(loader.getTemplate('foo').render(c), 'foo');
+   assert.equal(env.getTemplate('foo').render(c), 'foo');
    // still only one access
    assert.equal(mockLoader.templateAccess.foo, 1);
    // same for bar
-   assert.equal(loader.getTemplate('bar').render(c), 'bar');
-   assert.equal(loader.getTemplate('bar').render(c), 'bar');
+   assert.equal(env.getTemplate('bar').render(c), 'bar');
+   assert.equal(env.getTemplate('bar').render(c), 'bar');
    assert.equal(mockLoader.templateAccess.bar, 1);
 
 }

@@ -243,7 +243,6 @@ exports.testFilters = function() {
 
     for (var key in tests) {
         var test = tests[key];
-        print (key);
         if (test[2] == Error) {
               assert.throws(function() {
                           var t = new Template(test[0]);

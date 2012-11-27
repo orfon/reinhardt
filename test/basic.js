@@ -897,7 +897,6 @@ exports.testBasic = function() {
 
       for (var key in tests) {
             var test = tests[key];
-            print (key);
             if (test[2] == Error) {
                   assert.throws(function() {
                               var t = env.getTemplate(key);

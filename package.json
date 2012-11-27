@@ -3,11 +3,11 @@
     "version": "0.1.1",
     "description": "Django templates for JavaScript",
     "keywords": ["template"],
-    "maintainers": [{
+    "author": {
             "name": "Simon Oberhammer",
             "web": "http://nekapuzer.at/",
             "email": "simon@nekapuzer.at"
-        }],
+        },
     "contributors": [],
     "dependencies": {
     },

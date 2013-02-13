@@ -18,10 +18,10 @@ Install reinhardt with Ringo's admin command:
 
 The most basic way to render a template is to instantiate it from a string:
 
-   >> var {Template} = require('reinhardt/template');
-   >> var template = new Template('Hello {{ username}}');
-   >> template.render({username: 'Reinhardt'});
-   'Hello Reinhardt'
+    >> var {Template} = require('reinhardt/template');
+    >> var template = new Template('Hello {{ username}}');
+    >> template.render({username: 'Reinhardt'});
+    'Hello Reinhardt'
 
 In a bigger application you will use the higher-level Environment API to render templates. This works by creating an `Environment` to hold your shared configuration. You can then either use the environment's higher-level functions like `renderResponse()` or the `getTemplate()` function:
 
@@ -66,95 +66,95 @@ Implemented filters and tags
 =================================
 
 
-| Implemented |     Tag     |
-|      X      | autoescape  |
-|      X      | block       |
-|      X      | comment     |
-|             | csrf_token  |
-|      X      | cycle       |
-|             | debug       |
-|      X      | extends     |
-|      X      | filter      |
-|      X      | firstof     |
-|      X      | for         |
-|      X      | for...empty |
-|      X      | if          |
-|      X      | ifchanged   |
-|      X      | ifequal     |
-|      X      | ifnotequal  |
-|      X      | include     |
-|     NEW     | loadfilter  |
-|     NEW     | loadtag     |
-|     N/A     | load        |
-|             | now         |
-|             | regroup     |
-|      X      | spaceless   |
-|             | ssi         |
-|             | templatetag |
-|     N/A     | url         |
-|      X      | verbatim    |
-|      X      | widthratio  |
-|      X      | with        |
+    | Implemented |     Tag     |
+    |      X      | autoescape  |
+    |      X      | block       |
+    |      X      | comment     |
+    |             | csrf_token  |
+    |      X      | cycle       |
+    |             | debug       |
+    |      X      | extends     |
+    |      X      | filter      |
+    |      X      | firstof     |
+    |      X      | for         |
+    |      X      | for...empty |
+    |      X      | if          |
+    |      X      | ifchanged   |
+    |      X      | ifequal     |
+    |      X      | ifnotequal  |
+    |      X      | include     |
+    |     NEW     | loadfilter  |
+    |     NEW     | loadtag     |
+    |     N/A     | load        |
+    |             | now         |
+    |             | regroup     |
+    |      X      | spaceless   |
+    |             | ssi         |
+    |             | templatetag |
+    |     N/A     | url         |
+    |      X      | verbatim    |
+    |      X      | widthratio  |
+    |      X      | with        |
 
-| Implemented | Filter             |
-|             | add                |
-|      X      | addslashes         |
-|     NEW     | byKey              |
-|      X      | capfirst           |
-|      X      | center             |
-|      X      | cut                |
-|      X      | date               |
-|      X      | default            |
-|     N/A     | default_if_none    |
-|     NEW     | defaultifnull
-|     N/A     | dictsort           |
-|     N/A     | dictsort_reversed  |
-|             | divisibleby        |
-|      X      | escape             |
-|             | filesizeformat     |
-|             | first              |
-|      X      | fix_ampersands     |
-|      X      | floatformat        |
-|             | get_digit          |
-|             | iriencode          |
-|      X      | join               |
-|     NEW     | key                |
-|      X      | length             |
-|      X      | length_is          |
-|      X      | linebreaks         |
-|      X      | linebreaksbr       |
-|      X      | linenumbers        |
-|      X      | ljust              |
-|      X      | lower              |
-|      X      | make_list          |
-|             | phone2numeric      |
-|             | pluralize          |
-|             | pprint             |
-|             | random             |
-|      X      | removetags         |
-|      X      | rjust              |
-|      X      | safe               |
-|             | safeseq            |
-|      X      | slice              |
-|      X      | slugify            |
-|     NEW     | sortByKey          |
-|      X      | stringformat       |
-|      X      | striptags          |
-|             | time               |
-|             | timesince          |
-|             | timeuntil          |
-|      X      | title              |
-|      X      | truncatechars      |
-|      X      | truncatewords      |
-|      X      | truncatewords_html |
-|             | unordered_list     |
-|      X      | upper              |
-|             | urlencode          |
-|             | urlize             |
-|             | urlizetrunc        |
-|      X      | wordcount          |
-|      X      | wordwrap           |
-|      X      | yesno              |
+    | Implemented | Filter             |
+    |             | add                |
+    |      X      | addslashes         |
+    |     NEW     | byKey              |
+    |      X      | capfirst           |
+    |      X      | center             |
+    |      X      | cut                |
+    |      X      | date               |
+    |      X      | default            |
+    |     N/A     | default_if_none    |
+    |     NEW     | defaultifnull
+    |     N/A     | dictsort           |
+    |     N/A     | dictsort_reversed  |
+    |             | divisibleby        |
+    |      X      | escape             |
+    |             | filesizeformat     |
+    |             | first              |
+    |      X      | fix_ampersands     |
+    |      X      | floatformat        |
+    |             | get_digit          |
+    |             | iriencode          |
+    |      X      | join               |
+    |     NEW     | key                |
+    |      X      | length             |
+    |      X      | length_is          |
+    |      X      | linebreaks         |
+    |      X      | linebreaksbr       |
+    |      X      | linenumbers        |
+    |      X      | ljust              |
+    |      X      | lower              |
+    |      X      | make_list          |
+    |             | phone2numeric      |
+    |             | pluralize          |
+    |             | pprint             |
+    |             | random             |
+    |      X      | removetags         |
+    |      X      | rjust              |
+    |      X      | safe               |
+    |             | safeseq            |
+    |      X      | slice              |
+    |      X      | slugify            |
+    |     NEW     | sortByKey          |
+    |      X      | stringformat       |
+    |      X      | striptags          |
+    |             | time               |
+    |             | timesince          |
+    |             | timeuntil          |
+    |      X      | title              |
+    |      X      | truncatechars      |
+    |      X      | truncatewords      |
+    |      X      | truncatewords_html |
+    |             | unordered_list     |
+    |      X      | upper              |
+    |             | urlencode          |
+    |             | urlize             |
+    |             | urlizetrunc        |
+    |      X      | wordcount          |
+    |      X      | wordwrap           |
+    |      X      | yesno              |
 
 
 About the code

@@ -1,11 +1,46 @@
 Reinhardt - Django templates for RingoJs
 =============================================
 
-This is a JavaScript implementation of the Django Template System as described in <http://www.djangoproject.com/documentation/templates/> for RingoJs. A useful set of tags and filters has already been implemented (see below).
+This is a JavaScript implementation of the Django Template System as described in <http://www.djangoproject.com/documentation/templates/> for RingoJs.
+
+Reinhard already implements the larger part of the Django system including all logic (if/else, loops), lots of filters and tags as well as autoescaping.
 
  * aims to be functionally equivalent to the current django master
- * beta software
  * not intended to work in a browser environment
+ * beta software
+
+Quickstart Guide
+===================
+
+Install reinhardt with Ringo's admin command:
+
+     $ ringo-admin install oberhamsi/reinhardt
+
+The most basic way to render a template is to instantiate it from a string:
+
+   >> var {Template} = require('reinhardt/template');
+   >> var template = new Template('Hello {{ username}}');
+   >> template.render({username: 'Reinhardt'});
+   'Hello Reinhardt'
+
+In a bigger application you will use the higher-level Environment API to render templates. This works by creating an `Environment` to hold your shared configuration. You can then either use the environment's higher-level functions like `renderResponse()` or the `getTemplate()` function:
+
+    >> var {Environment} = require('reinhardt');
+    >> var renv = new Environment({
+         loader: module.resolve('./templates/')
+      });
+    >> renv.renderResponse("index.html")
+    {"status": 200, headers: "...", body: [...]}
+    >> renv.getTemplate()
+    [reinhardt Template]
+
+In any case, you will almost exclusively interact with those two classes: Environment and Template.
+
+Speed
+======
+
+There is a `examples/speed.js` which is farily easy to read. On my machine with the use-cases I have, reinhardt is roughly the same speed as the original Django template language.
+
 
 Implemented filters and tags
 =================================

@@ -36,11 +36,31 @@ In a bigger application you will use the higher-level Environment API to render 
 
 In any case, you will almost exclusively interact with those two classes: Environment and Template.
 
+More about the Environment
+----------------------------
+
+The configuration object for the Environment must have a `loader` property, as we have seen in the last example.
+
+The default loader is the filesystem loader which is implictely instantiated when the `loader` property is a string holding the path to the template directory or an Array of such strings.
+
+The configuration object can optionally have `filters` and `tags` properties pointing to an object with filters and tags. For example:
+
+    var env = new Environment({
+         loader: "./templates",
+         filters: [require('./mycustomfilters'), require('./foofilters')],
+         tags: require('./mytags')
+    });
+
+
 Speed
 ======
 
 There is a `examples/speed.js` which is farily easy to read. On my machine with the use-cases I have, reinhardt is roughly the same speed as the original Django template language.
 
+Custom Filters and Tags
+=========================
+
+For now, reading the django documentation and looking at existing Reinhard filters/tags in the `lib` directory should get you started fast.
 
 Implemented filters and tags
 =================================

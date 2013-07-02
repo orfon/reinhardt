@@ -3,8 +3,16 @@ Reinhardt - Django templates for RingoJs
 
 This is a JavaScript implementation of the Django Template System as described in <http://www.djangoproject.com/documentation/templates/> for RingoJs.
 
-Reinhard already implements the larger part of the Django system including all logic (if/else, loops), lots of filters and tags as well as autoescaping.
+Reinhard already implements the larger part of the Django system.
 
+  * all iteration and conditional tags (if/else, loops, etc)
+  * most other filters and tags (see below)
+  * autoescaping
+  * customize and extend - writing tags or filters is as easy
+
+
+Goals
+============
  * aims to be functionally equivalent to the current django master
  * not intended to work in a browser environment
  * beta software

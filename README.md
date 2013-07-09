@@ -3,12 +3,13 @@ Reinhardt - Django templates for RingoJs
 
 This is a JavaScript implementation of the Django Template System as described in <http://www.djangoproject.com/documentation/templates/> for RingoJs.
 
-Reinhard already implements the larger part of the Django system.
+Reinhard already implements the larger part of the Django templating system:
 
   * all iteration and conditional tags (if/else, loops, etc)
-  * most other filters and tags (see below)
+  * most other filters and tags (see table below)
   * autoescaping
-  * customize and extend - writing tags or filters is as easy
+  * customize and extend - writing tags or filters is as easy as with django
+  * tons of unit tests - almost all of django's tests succeed
 
 
 Goals
@@ -31,18 +32,17 @@ The most basic way to render a template is to instantiate it from a string:
     >> template.render({username: 'Reinhardt'});
     'Hello Reinhardt'
 
-In a bigger application you will use the higher-level Environment API to render templates. This works by creating an `Environment` to hold your shared configuration. You can then either use the environment's higher-level functions like `renderResponse()` or the `getTemplate()` function:
+A templating `Environment` allows you to configure additional tags and filters, 
+which will be available in all templates loaded through the environment. You will
+typically use an Environment for anything but very simple applications:
 
     >> var {Environment} = require('reinhardt');
     >> var renv = new Environment({
          loader: module.resolve('./templates/')
       });
-    >> renv.renderResponse("index.html")
-    {"status": 200, headers: "...", body: [...]}
-    >> renv.getTemplate()
-    [reinhardt Template]
+    >> renv.renderResponse("index.html", context)
+    {"status": 200, body: ["<html>..."]}
 
-In any case, you will almost exclusively interact with those two classes: Environment and Template.
 
 More about the Environment
 ----------------------------

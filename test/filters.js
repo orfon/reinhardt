@@ -237,7 +237,17 @@ exports.testFilters = function() {
         'filter-removetags02': ['{% autoescape off %}{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}{% endautoescape %}', {"a": "<a>x</a> <p><b>y</b></p>", "b": markSafe("<a>x</a> <p><b>y</b></p>")}, "x <p>y</p> x <p>y</p>"],
 
         'filter-keys': ['{% for key in obj|keys %} {{key}} {{obj|byKey:key}} {% endfor %}', {"obj": {"a": 1, "b": 2, "c": 3}}, " a 1  b 2  c 3 "],
-        'filter-keys': ['{% for key in obj|keys %} {{key}} {{obj|byKey:key}} {% endfor %}', {"obj": [11,22,33,44]}, " 0 11  1 22  2 33  3 44 "]
+        'filter-keys': ['{% for key in obj|keys %} {{key}} {{obj|byKey:key}} {% endfor %}', {"obj": [11,22,33,44]}, " 0 11  1 22  2 33  3 44 "],
+
+         // Tests for #11687 and #16676
+         'add01': ['{{ i|add:"5" }}', {'i': 2000}, '2005'],
+         // we allow this:
+         'add02': ['{{ i|add:"napis" }}', {'i': 2000}, '2000napis'],
+         // and this:
+         'add03': ['{{ i|add:16 }}', {'i': 'not_an_int'}, 'not_an_int16'],
+         'add04': ['{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'],
+         'add05': ['{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '1,2,3,4'],
+         // nope 'add07': ['{{ d|add:t }}', {'d': date(2000, 1, 1], 't': timedelta(10)}, 'Jan. 11, 2000'],
 
     };
 
@@ -381,12 +391,4 @@ if (require.main == module.id) {
         'date06': [r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'],
         'date07': [r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''],
 
-         // Tests for #11687 and #16676
-         'add01': [r'{{ i|add:"5" }}', {'i': 2000}, '2005'],
-         'add02': [r'{{ i|add:"napis" }}', {'i': 2000}, ''],
-         'add03': [r'{{ i|add:16 }}', {'i': 'not_an_int'}, ''],
-         'add04': [r'{{ i|add:"16" }}', {'i': 'not_an_int'}, 'not_an_int16'],
-         'add05': [r'{{ l1|add:l2 }}', {'l1': [1, 2], 'l2': [3, 4]}, '[1, 2, 3, 4]'],
-         'add06': [r'{{ t1|add:t2 }}', {'t1': [3, 4], 't2': [1, 2)}, '(3, 4, 1, 2)'],
-         'add07': [r'{{ d|add:t }}', {'d': date(2000, 1, 1], 't': timedelta(10)}, 'Jan. 11, 2000'],
 */

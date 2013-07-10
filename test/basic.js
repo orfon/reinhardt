@@ -757,6 +757,10 @@ exports.testBasic = function() {
             'filter02': ['{% filter upper %}django{% endfilter %}', {}, 'DJANGO'],
             'filter03': ['{% filter upper|lower %}django{% endfilter %}', {}, 'django'],
             'filter04': ['{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'],
+            'filter05': ['{% filter safe %}fail{% endfilter %}', {}, Error],
+            'filter05bis': ['{% filter upper|safe %}fail{% endfilter %}', {}, Error],
+            'filter06': ['{% filter escape %}fail{% endfilter %}', {}, Error],
+            'filter06bis': ['{% filter upper|escape %}fail{% endfilter %}', {}, Error],
 
             //FIRSTOF TAG ###########################################################
             'firstof01': ['{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''],

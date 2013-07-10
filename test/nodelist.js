@@ -28,8 +28,6 @@ exports.testIfEqual = function() {
     var vars = template.nodeList.getByType(VariableNode)
     assert.equal(vars.length, 1);
 }
-/*
-FIXME ifchanged not implemented yet
 
 exports.testIfChanged = function() {
     var source = '{% ifchanged x %}{{ a }}{% endifchanged %}';
@@ -37,5 +35,3 @@ exports.testIfChanged = function() {
     var vars = template.nodeList.getByType(VariableNode)
     assert.equal(vars.length, 1);
 }
-
-*/

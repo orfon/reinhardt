@@ -713,13 +713,18 @@ exports.testBasic = function() {
             'cycle17': ["{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""],
             'cycle18': ["{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, Error],
             'cycle19': ["{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"],
-            'cycle20': ["{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A & B &amp; C & D"],
+            'cycle20': ["{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"],
             //'cycle21': ["{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"],
             'cycle22': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "1234"],
             'cycle23': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1,2,3,4]}, "a1b2c3a4"],
             'included-cycle': ['{{ abc }}', {'abc': 'xxx'}, 'xxx'],
             'cycle24': ["{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1,2,3,4]}, "abca"],
-            'cycle25': ["{% cycle a,b,c as bar %}{% cycle 1,2,3 as foo %}{% cycle bar %}{% cycle foo %}{% cycle bar %}{% cycle foo %}", {}, "a1b2c3"],
+            'cycle24b': ["{% cycle a,b,c as bar %}{% cycle 1,2,3 as foo %}{% cycle bar %}{% cycle foo %}{% cycle bar %}{% cycle foo %}", {}, "a1b2c3"],
+
+            'cycle25': ['{% cycle a as abc %}', {'a': '<'}, '&lt;'],
+            'cycle26': ['{% cycle a b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '&lt;&gt;'],
+            'cycle27': ['{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}', {'a': '<', 'b': '>'}, '<>'],
+            'cycle28': ['{% cycle a|safe b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '<&gt;'],
 
             //IFCHANGED TAG #########################################################
             'ifchanged01': ['{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}', {'num': [1,2,3]}, '123'],
@@ -774,8 +779,11 @@ exports.testBasic = function() {
             'firstof07': ['{% firstof a b "c" %}', {'a':0}, 'c'],
             'firstof08': ['{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'],
             'firstof09': ['{% firstof %}', {}, Error],
-            'firstof10': ['{% firstof a %}', {'a': '<'}, '<'], //Variables are NOT auto-escaped.
 
+            'firstof11': ['{% firstof a b %}', {'a': '<', 'b': '>'}, '&lt;'],
+            'firstof12': ['{% firstof a b %}', {'a': '', 'b': '>'}, '&gt;'],
+            'firstof13': ['{% autoescape off %}{% firstof a %}{% endautoescape %}', {'a': '<'}, '<'],
+            'firstof14': ['{% firstof a|safe b %}', {'a': '<'}, '<'],
 
             // {% spaceless %} tag
             'spaceless01': ["{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b><i> text </i></b>"],

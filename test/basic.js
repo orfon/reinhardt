@@ -240,6 +240,8 @@ exports.testBasic = function() {
             'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
             'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
+            // bug #5
+            //'for-tag-filter-ws': ["{% for x in ''|add:'a b c' %}{{ x }}{% endfor %}", {}, 'a b c'],
 
             //FILTERS ###########################################################
 

@@ -32,7 +32,7 @@ The most basic way to render a template is to instantiate it from a string:
     >> template.render({username: 'Reinhardt'});
     'Hello Reinhardt'
 
-A templating `Environment` allows you to configure additional tags and filters, 
+A templating `Environment` allows you to configure additional tags and filters,
 which will be available in all templates loaded through the environment. You will
 typically use an Environment for anything but very simple applications:
 
@@ -164,6 +164,18 @@ Implemented filters and tags
     |      X      | wordwrap           |
     |      X      | yesno              |
 
+Contributing
+===============
+
+  * read the django commits
+    * create issue for commits we need to port
+    * actually port them, by:
+      * writing the unit tests
+      * fixing the code
+  * make disabled unit tests work or port new unit tests from django
+  * write documentation
+
+When porting from Django: do not worry about "future" and backwards compatibility. We will deal with that once we hit 1.0.
 
 About the code
 ===============

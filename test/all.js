@@ -5,6 +5,7 @@ exports.testFilters = require('./filters');
 exports.testLexer = require('./lexer');
 exports.testLoader = require('./loader');
 exports.testNodeList = require('./nodelist');
+exports.testRegressions = require('./regressions');
 exports.testSmartIf = require('./smartif');
 exports.testTemplate = require('./template');
 exports.testVariable = require('./variable');

@@ -11,7 +11,6 @@ Reinhard already implements the larger part of the Django templating system:
   * customize and extend - writing tags or filters is as easy as with django
   * tons of unit tests - almost all of django's tests succeed
 
-
 Goals
 ============
  * aims to be functionally equivalent to the current django master
@@ -27,7 +26,6 @@ Install reinhardt with Ringo's admin command:
 
 The most basic way to render a template is to instantiate it from a string:
 
-    >> var {Template} = require('reinhardt/template');
     >> var template = new Template('Hello {{ username}}');
     >> template.render({username: 'Reinhardt'});
     'Hello Reinhardt'
@@ -36,11 +34,12 @@ A templating `Environment` allows you to configure additional tags and filters,
 which will be available in all templates loaded through the environment. You will
 typically use an Environment for anything but very simple applications:
 
-    >> var {Environment} = require('reinhardt');
-    >> var renv = new Environment({
-         loader: module.resolve('./templates/')
+    >> var env = new Environment({
+         loader: module.resolve('./templates/'),
+         filters: require('./mycustomfilters')
+
       });
-    >> renv.renderResponse("index.html", context)
+    >> env.renderResponse("index.html", context)
     {"status": 200, body: ["<html>..."]}
 
 
@@ -167,8 +166,8 @@ Implemented filters and tags
 Contributing
 ===============
 
-  * read the django commits
-    * create issue for commits we need to port
+  * read the django commits related to templating: https://github.com/django/django/commits/master/django/template
+    * create issue for commits we need to port (with link to original commit in django)
     * actually port them, by:
       * writing the unit tests
       * fixing the code

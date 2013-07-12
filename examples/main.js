@@ -13,10 +13,15 @@ var context = {
 var env = new Environment({
    loader: [module.resolve('./templates/'), module.resolve('./templates2')],
 });
+env.DEBUG = true;
 
 exports.app = function(req) {
    var templateName = req.pathInfo.split('/').slice(1)[0] || 'base.html';
-   return env.renderResponse(templateName, context);
+   try {
+      return env.renderResponse(templateName, context);
+   } catch (e) {
+      return e;
+   }
 };
 
 if (require.main == module) {

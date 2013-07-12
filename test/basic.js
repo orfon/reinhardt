@@ -49,7 +49,7 @@ exports.testBasic = function() {
       var TestTemplateLoader = function() {
             this.loadTemplateSource = function(templateName) {
                   if (tests[templateName]) {
-                        return tests[templateName][0];
+                        return [tests[templateName][0], templateName];
                   }
                   return null;
             }
@@ -911,6 +911,7 @@ exports.testBasic = function() {
 
       for (var key in tests) {
             var test = tests[key];
+            print (key)
             if (test[2] == Error) {
                   assert.throws(function() {
                               var t = env.getTemplate(key);

@@ -3,7 +3,7 @@ var {Environment} = require('reinhardt');
 var context = {
    links: [
       ['Main', '/'],
-      ['Discovery of Jazz', './discoveryofjazz.html'],
+      ['Error page for TemplateSyntaxError', './discoveryofjazz.html'],
       ['Youth & Early Life', './earlylife.html'],
       ['World War II', './worldwar2.html']
    ],

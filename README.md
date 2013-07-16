@@ -8,8 +8,8 @@ Reinhard already implements the larger part of the Django templating system:
   * all iteration and conditional tags (if/else, loops, etc)
   * most other filters and tags (see table below)
   * autoescaping
-  * customize and extend - writing tags or filters is as easy as with django
-  * tons of unit tests - almost all of django's tests succeed
+  * customize and extend - writing tags and filters
+  * tons of unit tests - our unit tests are copied straight from django
 
 Goals
 ============
@@ -42,6 +42,18 @@ typically use an Environment for anything but very simple applications:
     >> env.renderResponse("index.html", context)
     {"status": 200, body: ["<html>..."]}
 
+Debugging templates
+---------------------
+
+Enable debugging in the environment and put the reinhardt middleware into your application:
+
+    >> app.configure(require('reinhardt/middleware'));
+    >> var env = new Environment({
+         debug: true
+       });
+
+Debugging is disabled by default and you should not enable it in production since it displays
+the source and location of your templates.
 
 More about the Environment
 ----------------------------

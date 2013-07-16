@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ errorName }}</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        background: #eeeeee;
+    }
+
+    #header {
+        background-color: #cccc99;
+    }
+
+    #header h1 {
+        font-weight: normal;
+        font-size: 28px;
+        margin: 0;
+    }
+
+    h3 {
+        font-weight: normal;
+    }
+
+    #body {
+        background-color: #ffffff;
+    }
+
+    #header, #body {
+        padding: 30px;
+        border-bottom: 1px solid #aaaaaa;
+    }
+</style>
+
+<div id="header">
+
+    <h1> {{errorName}} in {{templateName}} at line {{lineNo}}: </h1>
+
+    <div style="margin-left: 2em">
+        <pre>{{before}}<span style="border-bottom: 1px solid red">{{during}}</span>{{after}}</pre>
+    </div>
+    <h3>{{errorMessage}}</h3>
+
+</div>
+
+<div id="body">
+    <h3> {{templateName}}:</h3>
+
+    {% spaceless %}
+    <div style="margin-left: 2em;font-family:monospace">
+            {% for line in contextLines %}
+                {{ contextTop|add:forloop.counter}} {{line}}<br/>
+            {% endfor %}
+    </div>
+    {% endspaceless %}
+
+    <h3> Template search paths: </h3>
+
+    <ul>
+    {% for path in directories %}
+        <li> {{path}}
+    {% endfor %}
+    </ul>
+</div>
+
+</body>
+</html>

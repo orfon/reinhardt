@@ -2,6 +2,7 @@ var assert = require("assert");
 var {markSafe} = require('../lib/utils');
 var {Template} = require('../lib/template');
 var {Context} = require('../lib/context');
+var {Environment} = require('../lib/environment');
 
 var UnsafeClass = function() {
     return this;
@@ -263,21 +264,24 @@ exports.testFilters = function() {
 
     };
 
-    for (var key in tests) {
-        var test = tests[key];
-        if (test[2] == Error) {
-              assert.throws(function() {
-                          var t = new Template(test[0]);
-                          t.render(new Context(test[1]));
-                    },
-                    test[2],
-                    key
-              );
-        } else {
-              var template = new Template(test[0]);
-              assert.strictEqual(template.render(new Context(test[1])), test[2], key);
-        }
-    }
+    [false, true].forEach(function(debug) {
+       var env = new Environment({debug: debug});
+       for (var key in tests) {
+           var test = tests[key];
+           if (test[2] == Error) {
+                 assert.throws(function() {
+                             var t = new Template(test[0], env);
+                             t.render(new Context(test[1]));
+                       },
+                       test[2],
+                       key
+                 );
+           } else {
+                 var template = new Template(test[0], env);
+                 assert.strictEqual(template.render(new Context(test[1])), test[2], key);
+           }
+       }
+    });
 }
 
 //start the test runner if we're called directly from command line

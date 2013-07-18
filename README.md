@@ -32,7 +32,9 @@ Documentation
 
   * [Quickstart guide](docs/quickstart.md)
   * [Reinhardt template language overview](docs/templates.md)
-  * References for the built in [Tags](docs/tags.md) [Filters](docs/filters.md)
+  * References for the built in
+    * [Tags](docs/tags.md)
+    * [Filters](docs/filters.md)
 
 Speed
 ======

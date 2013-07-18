@@ -261,6 +261,11 @@ exports.testFilters = function() {
         // Timezone name
         // how to? 'date06': ['{{ d|date:"e" }}', {'d': new Date(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'],
         'date07': ['{{ d|date:"e" }}', {'d': new Date(2009, 3, 12)}, ''],
+        'filter-first01': ['{{ a|first }} {{ b|first }}', {"a": ["a&b", "x"], "b": [markSafe("a&b"), "x"]}, "a&amp;b a&b"],
+        'filter-first02': ['{% autoescape off %}{{ a|first }} {{ b|first }}{% endautoescape %}', {"a": ["a&b", "x"], "b": [markSafe("a&b"), "x"]}, "a&b a&b"],
+
+        'filter-last01': ['{{ a|last }} {{ b|last }}', {"a": ["x", "a&b"], "b": ["x", markSafe("a&b")]}, "a&amp;b a&b"],
+        'filter-last02': ['{% autoescape off %}{{ a|last }} {{ b|last }}{% endautoescape %}', {"a": ["x", "a&b"], "b": ["x", markSafe("a&b")]}, "a&b a&b"],
 
     };
 
@@ -268,6 +273,7 @@ exports.testFilters = function() {
        var env = new Environment({debug: debug});
        for (var key in tests) {
            var test = tests[key];
+           print (key, 'debug:', debug);
            if (test[2] == Error) {
                  assert.throws(function() {
                              var t = new Template(test[0], env);
@@ -361,12 +367,6 @@ if (require.main == module.id) {
 
         'filter-urlizetrunc01': ['{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}', {"a": '"Unsafe" http://example.com/x=&y=', "b": markSafe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, '"Unsafe" <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'],
         'filter-urlizetrunc02': ['{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}', {"a": '"Unsafe" http://example.com/x=&y=', "b": markSafe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, '&quot;Unsafe&quot; <a href="http://example.com/x=&amp;y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'],
-
-        'filter-first01': ['{{ a|first }} {{ b|first }}', {"a": ["a&b", "x"], "b": [markSafe("a&b"], "x"]}, "a&amp;b a&b"],
-        'filter-first02': ['{% autoescape off %}{{ a|first }} {{ b|first }}{% endautoescape %}', {"a": ["a&b", "x"], "b": [markSafe("a&b"], "x"]}, "a&b a&b"],
-
-        'filter-last01': ['{{ a|last }} {{ b|last }}', {"a": ["x", "a&b"], "b": ["x", markSafe("a&b")]}, "a&amp;b a&b"],
-        'filter-last02': ['{% autoescape off %}{{ a|last }} {{ b|last }}{% endautoescape %}', {"a": ["x", "a&b"], "b": ["x", markSafe("a&b")]}, "a&b a&b"],
 
         'filter-random01': ['{{ a|random }} {{ b|random }}', {"a": ["a&b", "a&b"], "b": [markSafe("a&b"], markSafe("a&b")]}, "a&amp;b a&b"],
         'filter-random02': ['{% autoescape off %}{{ a|random }} {{ b|random }}{% endautoescape %}', {"a": ["a&b", "a&b"], "b": [markSafe("a&b"], markSafe("a&b")]}, "a&b a&b"],

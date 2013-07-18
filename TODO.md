@@ -11,6 +11,13 @@ Contributing
 
 When porting from Django: do not worry about "future" and backwards compatibility. We will deal with that once we hit 1.0.
 
+Goals
+============
+ * aims to be functionally equivalent to the current django master
+ * not intended to work in a browser environment
+ * beta software
+
+
 Implemented filters and tags
 =================================
 

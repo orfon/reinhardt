@@ -1,15 +1,36 @@
 The Reinhardt template language
 ============================
 
-This document explains the language syntax of the Reinhardt template system. If
-you're looking for a more technical perspective on how it works and how to
-extend it, see [templates-api].
+This document explains the language syntax of the Reinhardt template system.
 
 The Reinhardt template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
 you have any exposure to other text-based template languages, such as Smarty
 or CheetahTemplate, you should feel right at home with Reinhardt's templates.
 
+**Table of Contents**
+
+- [Templates](#templates)
+- [Variables](#variables)
+- [Filters](#filters)
+  - [default](#default)
+  - [length](#length)
+  - [striptags](#striptags)
+- [Tags](#tags)
+  - [for](#for)
+  - [if and else](#if-and-else)
+  - [block and extends](#block-and-extends)
+- [Comments](#comments)
+- [Template inheritance](#template-inheritance)
+- [Automatic HTML escaping](#automatic-html-escaping)
+  - [How to turn it off](#how-to-turn-it-off)
+  - [For individual variables](#for-individual-variables)
+  - [For template blocks](#for-template-blocks)
+  - [Notes](#notes)
+  - [String literals and automatic escaping](#string-literals-and-automatic-escaping)
+- [Accessing functions](#accessing-functions)
+- [Custom tag and filter libraries](#custom-tag-and-filter-libraries)
+  - [Custom libraries and template inheritance](#custom-libraries-and-template-inheritance)
 
 Templates
 =========

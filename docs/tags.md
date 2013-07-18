@@ -3,6 +3,28 @@ Built-in template tags
 
 This document describes Reinhardt's built-in template tags.
 
+**List of built in tags**
+
+- [autoescape](#autoescape)
+- [block](#block)
+- [comment](#comment)
+- [cycle](#cycle)
+- [extends](#extends)
+- [filter](#filter)
+- [firstof](#firstof)
+- [for](#for)
+- [for ... empty](#for--empty)
+- [if](#if)
+- [ifchanged](#ifchanged)
+- [ifequal](#ifequal)
+- [ifnotequal](#ifnotequal)
+- [include](#include)
+- [loadtag / loadfilter](#loadtag--loadfilter)
+- [spaceless](#spaceless)
+- [verbatim](#verbatim)
+- [widthratio](#widthratio)
+- [with](#with)
+
 autoescape
 -----------
 

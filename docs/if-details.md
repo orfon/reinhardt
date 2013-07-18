@@ -1,6 +1,22 @@
 "if" tag details
 ===================
 
+This document describes the operator details of the if tag.
+
+**Table of Contents**
+
+- [Boolean operators](#boolean-operators)
+- [== operator](#-operator)
+- [!= operator](#-operator-1)
+- [< operator](#-operator-2)
+- [> operator](#-operator-3)
+- [<= operator](#-operator-4)
+- [>= operator](#-operator-5)
+- [in operator](#in-operator)
+- [not in operator](#not-in-operator)
+- [Filters](#filters)
+- [Complex expressions](#complex-expressions)
+
 Boolean operators
 ------
 

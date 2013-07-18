@@ -3,6 +3,48 @@ Built-in template filters
 
 This document describes Reinhardt's built-in template filters.
 
+**List of built in filters**
+
+- [add](#add)
+- [addslashes](#addslashes)
+- [byKey](#bykey)
+- [capfirst](#capfirst)
+- [center](#center)
+- [cut](#cut)
+- [date](#date)
+- [default](#default)
+- [defaultifnull](#defaultifnull)
+- [escape](#escape)
+- [first](#first)
+- [fix_ampersands](#fix_ampersands)
+- [floatformat](#floatformat)
+- [force_escape](#force_escape)
+- [join](#join)
+- [last](#last)
+- [length](#length)
+- [length_is](#length_is)
+- [linebreaks](#linebreaks)
+- [linebreaksbr](#linebreaksbr)
+- [linenumbers](#linenumbers)
+- [ljust](#ljust)
+- [lower](#lower)
+- [make_list](#make_list)
+- [removetags](#removetags)
+- [rjust](#rjust)
+- [safe](#safe)
+- [slice](#slice)
+- [slugify](#slugify)
+- [sortByKey](#sortbykey)
+- [striptags](#striptags)
+- [title](#title)
+- [truncatechars](#truncatechars)
+- [truncatewords](#truncatewords)
+- [truncatewords_html](#truncatewords_html)
+- [upper](#upper)
+- [wordcount](#wordcount)
+- [wordwrap](#wordwrap)
+- [yesno](#yesno)
+
 add
 ------
 

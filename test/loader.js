@@ -12,7 +12,7 @@ var MockLoader = function() {
          return null;
       }
       this.templateAccess[templateName]++;
-      return templateName;
+      return [templateName, templateName];
    }
 
    this.reset = function() {

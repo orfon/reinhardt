@@ -49,13 +49,12 @@ exports.testBasic = function() {
       var TestTemplateLoader = function() {
             this.loadTemplateSource = function(templateName) {
                   if (tests[templateName]) {
-                        return tests[templateName][0];
+                        return [tests[templateName][0], templateName];
                   }
                   return null;
             }
             return this;
       }
-      var env = new Environment({loader: new TestTemplateLoader()})
 
       // 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
       var tests = {
@@ -909,21 +908,27 @@ exports.testBasic = function() {
             'widthratio14b': ['{% widthratio a b c %}', {'a':0,'b':100,'c':null}, Error],
       };
 
-      for (var key in tests) {
-            var test = tests[key];
-            if (test[2] == Error) {
-                  assert.throws(function() {
-                              var t = env.getTemplate(key);
-                              t.render(new Context(test[1]));
-                        },
-                        test[2],
-                        key
-                  );
-            } else {
-                  var template = env.getTemplate(key);
-                  assert.strictEqual(template.render(new Context(test[1])), test[2], key);
-            }
-      }
+      // run tests twice: debug=true and debug=false
+      [false, true].forEach(function(debug) {
+
+         var env = new Environment({loader: new TestTemplateLoader(), debug: debug})
+         for (var key in tests) {
+               var test = tests[key];
+               print (key, 'debug:', debug);
+               if (test[2] == Error) {
+                     assert.throws(function() {
+                                 var t = env.getTemplate(key);
+                                 t.render(new Context(test[1]));
+                           },
+                           test[2],
+                           key
+                     );
+               } else {
+                     var template = env.getTemplate(key);
+                     assert.strictEqual(template.render(new Context(test[1])), test[2], key);
+               }
+         }
+      });
 
 }
 

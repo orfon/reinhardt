@@ -35,6 +35,9 @@ Documentation
   * References for the built in
     * [Tags](docs/tags.md)
     * [Filters](docs/filters.md)
+  * Extending Reinhardt
+    * [Custom template-filters](custom-template-filters.md)
+    * [Custom template tags](custom-template-tags.md)
 
 Speed
 ======

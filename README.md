@@ -36,8 +36,8 @@ Documentation
     * [Tags](docs/tags.md)
     * [Filters](docs/filters.md)
   * Extending Reinhardt
-    * [Custom template-filters](custom-template-filters.md)
-    * [Custom template tags](custom-template-tags.md)
+    * [Custom template filters](docs/custom-template-filters.md)
+    * [Custom template tags](docs/custom-template-tags.md)
 
 Speed
 ======

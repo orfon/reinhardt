@@ -99,15 +99,15 @@ Continuing the above example, we need to define ``CurrentTimeNode``:
     var dates = require('ringo/utils/dates');
     var {Node} = require('reinhardt/nodes');
 
-    var CurrentTimeNode = function(formatString) {
-      this.formatString = formatString;
-      return this;
-    }
-    // use the getByType from superlcass `Node`.
-    CurrentTimeNode.prototype.getByType = Node.prototype.getByType;
-    CurrentTimeNode.prototype.render = function(context) {
-       return dates.format(new Date(), this.formatString);
-    }
+    var CurrentTimeNode = Node.augment(function() {
+      this.constructor = function(formatString) {
+        this.formatString = formatString;
+        return this;
+      },
+      this.render = function(context) {
+         return dates.format(new Date(), this.formatString);
+      }
+    });
 
 Notes:
 
@@ -155,11 +155,11 @@ This is not a very common situation, but it's useful if you're rendering a
 template yourself. For example:
 
 
-    ...render = function(context) {
-        // ...
-        var t = template.loader.loadTemplateSource('small_fragment.html')
-        return t.render(Context({'var': obj}, context.autoescape))
-      }
+    CurrentTimeNode.prototype.render = function(context) {
+      // ...
+      var t = template.loader.loadTemplateSource('small_fragment.html')
+      return t.render(Context({'var': obj}, context.autoescape))
+    }
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been
@@ -191,14 +191,15 @@ A naive implementation of ``CycleNode`` might look something like this:
 
     var {cycle} = require('reinhardt/utils/iter');
 
-    var CycleNode = function(cyclevars) {
-      this.cycleIter = cycle(cyclevars);
-      return this;
-    }
-
-    CycleNode.prototype.render = function(context) {
-       return this.cycleIter.next();
-    }
+    var CycleNode = Node.augment(function() {
+      this.constructor = function(cyclevars) {
+        this.cycleIter = cycle(cyclevars);
+        return this;
+      },
+      this.render = function(context) {
+         return this.cycleIter.next();
+      }
+    });
 
 
 But, suppose we have two templates rendering the template snippet from above at
@@ -227,21 +228,22 @@ Let's refactor our ``CycleNode`` implementation to use the ``renderContext``:
 
     var {cycle} = require('reinhardt/utils/iter');
 
-    var CycleNode = function(cyclevars) {
-      this.cyclevars = cyclevars;
-      // each CycleNode needs a unique id
-      // which we use to put our state into `renderContext`
-      this.uuid = java.util.UUID.randomUUID().toString();
-      return this;
-    }
-
-    CycleNode.prototype.render = function(context) {
-       if (! context.renderContext.has(this.uuid)) {
-          context.renderContext.set(this.uuid, cycle(this.cyclevars));
-       }
-       cycleIter = context.renderContext.get(this.uuid);
-       return cycleIter.next();
-    }
+    var CycleNode = Node.augment(function() {
+      this.constructor = function(cyclevars) {
+        this.cyclevars = cyclevars;
+        // each CycleNode needs a unique id
+        // which we use to put our state into `renderContext`
+        this.uuid = java.util.UUID.randomUUID().toString();
+        return this;
+      },
+      this.render = function(context) {
+         if (! context.renderContext.has(this.uuid)) {
+            context.renderContext.set(this.uuid, cycle(this.cyclevars));
+         }
+         cycleIter = context.renderContext.get(this.uuid);
+         return cycleIter.next();
+      }
+    });
 
 Note that it's perfectly safe to store global information that will not change
 throughout the life of the ``Node`` as an instance property. In the case of
@@ -302,18 +304,20 @@ for example:
 
 
     var {Variable} = require("reinhard/variable");
-    var FormatTimeNode = function(dateToBeFormatted, formatString) {
-      this.dateToBeFormatted = new Variable(dateToBeFormatted, formatString)
-      return this;
-    }
-    FormatTimeNode.prototype.render = function(context) {
-        try {
-          var actualDate = this.dateToBeFormatted.resolve(context);
-          return dates.format(actualDate, this.formatString);
-        } catch (e) {
-          return '';
-        }
-    }
+    var FormatTimeNode = Node.augment(function() {
+      this.constructor = function(dateToBeFormatted, formatString) {
+        this.dateToBeFormatted = new Variable(dateToBeFormatted, formatString)
+        return this;
+      },
+      this.render = function(context) {
+          try {
+            var actualDate = this.dateToBeFormatted.resolve(context);
+            return dates.format(actualDate, this.formatString);
+          } catch (e) {
+            return '';
+          }
+      }
+    });
 
 Variable resolution will throw an  exception if it cannot resolve the string
 passed to it in the current context of the page.
@@ -336,14 +340,16 @@ object in the ``render()`` method. Here's an updated version of
 outputting it:
 
 
-    var CurrentTimeNode2 = function(formatString) {
-      this.formatString = formatString;
-      return this;
-    }
-    CurrentTimeNode2.prototype.render = function(context) {
-      context['current_time'] = dates.format(new Date(), this.formatString);
-      return;
-    }
+    var CurrentTimeNode2 = Node.augment(function() {
+      this.constructor = function(formatString) {
+        this.formatString = formatString;
+        return this;
+      },
+      this.render = function(context) {
+        context['current_time'] = dates.format(new Date(), this.formatString);
+        return;
+      }
+    });
 
 Note that ``render()`` returns the empty string. ``render()`` should always
 return string output. If all the template tag does is set a variable,
@@ -375,15 +381,17 @@ To do that, you'll need to refactor both the compilation function and ``Node``
 class, like so:
 
 
-    var CurrentTimeNode3 = function(formatString, varName) {
-      this.formatString = formatString;
-      this.varName = varName;
-      return this;
-    }
-    CurrentTimeNode3.prototype.render = function(context) {
-      context[this.varName] = dates.format(new Date(), this.formatString);
-      return;
-    }
+    var CurrentTimeNode3 = Node.augment(function() {
+      this.constructor = function(formatString, varName) {
+        this.formatString = formatString;
+        this.varName = varName;
+        return this;
+      },
+      this.render = function(context) {
+        context[this.varName] = dates.format(new Date(), this.formatString);
+        return;
+      }
+    });
 
     exports.current_time = function(parser, token) {
       var bits = token.splitContents();
@@ -412,11 +420,11 @@ as this, use ``parser.parse()`` in your compilation function.
 
 Here's how a simplified ``{% comment %}`` tag might be implemented:
 
-    var CommentNode = function() {};
-    CommentNode.prototype.getByType = Node.prototype.getByType;
-    CommentNode.prototype.render = function() {
-      return '';
-    }
+    var CommentNode = Node.augment(function() {
+      this.render = function() {
+        return '';
+      }
+    });
 
 
 Note: The actual implementation of `{% comment %}` is slightly different in
@@ -459,15 +467,16 @@ Usage:
 As in the previous example, we'll use ``parser.parse()``. But this time, we
 pass the resulting ``nodelist`` to the ``Node``:
 
-    var UpperNode = function(nodelist) {
-      this.nodelist = nodelist;
-      return this;
-    }
-    UpperNode.prototype.getByType = Node.prototype.getByType;
-    UpperNode.prototype.render = function(context) {
-        var output = this.nodelist.render(context);
-        return output.toUpperCase();
-    }
+    var UpperNode = Node.augment(function() {
+      this.constructor = function(nodelist) {
+        this.nodelist = nodelist;
+        return this;
+      },
+      this.render = function(context) {
+          var output = this.nodelist.render(context);
+          return output.toUpperCase();
+      }
+    });
 
     exports.upper = function(parser, token) {
         var nodelist = parser.parse(['endupper']);

@@ -10,6 +10,7 @@
         },
     "contributors": [],
     "dependencies": {
+        "augment": "3.0"
     },
     "licenses": [{
         "type": "Apache License Version 2.0",

@@ -6,9 +6,9 @@ Tags are more complex than filters, because tags can do anything.
 A quick overview
 --------------------
 
-Above, this document explained that the template system works in a two-step
-process: compiling and rendering. To define a custom template tag, you specify
-how the compilation works and how the rendering works.
+The template system works in a two-step process: compiling and rendering. To
+define a custom template tag, you specify how the compilation works and how
+the rendering works.
 
 When Reinhardt compiles a template, it splits the raw template text into
 ''nodes''. Each node is an instance of ``reinhardt.nodes.Node`` and has
@@ -34,7 +34,7 @@ Java's SimpleDate syntax. It's a good idea to decide the tag syntax before
 anything else. In our case, let's say the tag should be used like this:
 
 
-    <p>The time is {% current_time "MM/dd/yyyy" %}.</p>
+    <p>The time is {% current_time "HH:mm:ss" %}.</p>
 
 The parser for this function should grab the parameter and create a ``Node``
 object:
@@ -44,10 +44,10 @@ object:
     exports.current_time = function(parser, token) {
         # split_contents() knows not to split quoted strings.
         var bits = token.splitContents();
-        if (bits.length != 2) {
-          throw new TemplateSyntaxError("current_time tag requires a single argument");
-        }
         var tagName = bits[0];
+        if (bits.length != 2) {
+          throw new TemplateSyntaxError(tagName + " tag requires a single argument");
+        }
         var formatString = bits[1];
         if (formatString[0] !== formatString.slice(-1) || ['"', "'"].indexOf(formatString) < 0) {
           throw new TemplateSyntaxError(tagName + " tag argument should be in quotes");
@@ -61,7 +61,7 @@ Notes:
   example.
 
 * ``token.contents`` is a string of the raw contents of the tag. In our
-  example, it's ``'current_time "MM/dd/yyyy"'``.
+  example, it's `current_time "HH:mm:ss"`.
 
 * The ``token.splitContents()`` method separates the arguments on spaces
   while keeping quoted strings together. The more straightforward
@@ -80,7 +80,7 @@ helpful messages, for any syntax error.
 
 * The function returns a ``CurrentTimeNode`` with everything the node needs
   to know about this tag. In this case, it just passes the argument --
-  ``"%Y-%m-%d %I:%M %p"``. The leading and trailing quotes from the
+  ``"HH:mm:ss"``. The leading and trailing quotes from the
   template tag are removed in ``formatString.slice(1, -1)``.
 
 * The parsing is very low-level. The Django developers have experimented
@@ -95,7 +95,6 @@ The second step in writing custom tags is to define a ``Node`` subclass that
 has a ``render()`` method.
 
 Continuing the above example, we need to define ``CurrentTimeNode``:
-
 
     var dates = require('ringo/utils/dates');
     var {Node} = require('reinhardt/nodes');
@@ -280,10 +279,10 @@ Now your tag should begin to look like this:
 
     exports.format_time = function(parser, token) {
         var bits = token.splitContents();
+        var tagName = bits[0];
         if (bits.length != 3) {
           throw TemplateSyntaxError(tagName + 'requires exactly two arguments');
         }
-        var tagName = bits[0];
         var dateToBeFormatted = bits[1];
         var formatString = bits[2];
         if (formatString[0] !== formatString.slice(-1) || ['"', "'"].indexOf(formatString) < 0) {
@@ -421,20 +420,19 @@ Here's how a simplified ``{% comment %}`` tag might be implemented:
 
 
 Note: The actual implementation of `{% comment %}` is slightly different in
-that it allows broken template tags to appear between     ``{% comment %}``
-and ``{% endcomment %}``. It does so by calling
-``parser.skipPast('endcomment')`` instead of ``parser.parse(('endcomment',))``
-followed by ``parser.deleteFirstToken()``, thus avoiding the generation of a
-node list.
+that it allows broken template tags to appear between ``{% comment %}`` and
+``{% endcomment %}``. It does so by calling ``parser.skipPast('endcomment')``
+instead of ``parser.parse(('endcomment',))`` followed by
+``parser.deleteFirstToken()``, thus avoiding the generation of a node list.
 
 ``parser.parse()`` takes a tuple of names of block tags ''to parse until''. It
 returns an instance of ``reinhardt.nodelist.NodeList``, which is a list of
 all ``Node`` objects that the parser encountered ''before'' it encountered
 any of the tags named in the tuple.
 
-In ``"nodelist = parser.parse(('endcomment',))"`` in the above example,
-``nodelist`` is a list of all nodes between the ``{% comment %}`` and
-``{% endcomment %}``, not counting ``{% comment %}`` and ``{% endcomment %}``
+In ``nodelist = parser.parse(('endcomment',))`` in the above example,
+``nodelist`` is a list of all nodes between the ``{% comment %}`` and ``{%
+endcomment %}``, not counting ``{% comment %}`` and ``{% endcomment %}``
 themselves.
 
 After ``parser.parse()`` is called, the parser hasn't yet "consumed" the

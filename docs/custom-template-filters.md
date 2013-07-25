@@ -52,8 +52,8 @@ interpreted as-is on the client side. Internally, these strings are instances
 of `String` with the property `isSafe=true` attached. You can test for them
 using code like:
 
-       var {isSafe} = require('reinhardt/utils');
-       isSafe(fooString)
+    var {isSafe} = require('reinhardt/utils');
+    isSafe(fooString)
 
 
 * **Strings marked as "needing escaping"** are *always* escaped on output,

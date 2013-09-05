@@ -26,6 +26,25 @@ Demonstration of a small Reinhardt template:
       </ul>
     {% endblock %}
 
+Quickstart
+============
+
+Create a templates environment and render a template:
+
+    var {Environment} = require('reinhardt');
+    var templates = new Environment({
+      loader: '/path/to/templates/',
+      debug: true
+    });
+
+    var template = templates.getTemplate('index.html');
+    var html = template.render({"hello": "world"});
+
+For easier template debugging, add the reinhardt middleware
+to your application:
+
+    app.configure(require('reinhardt/middleware'), 'route')
+
 
 Documentation
 =========================

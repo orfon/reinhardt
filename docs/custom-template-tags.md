@@ -285,8 +285,8 @@ Now your tag should begin to look like this:
         }
         var dateToBeFormatted = bits[1];
         var formatString = bits[2];
-        if (formatString[0] !== formatString.slice(-1) || ['"', "'"].indexOf(formatString) < 0) {
-          throw TemplateSyntaxError(tagName + ' tag's argument should be in quotes)
+        if (formatString[0] !== formatString.slice(-1) || ['"', "'"].indexOf(formatString[0]) < 0) {
+          throw TemplateSyntaxError(tagName + " tag's argument should be in quotes")
         }
         return FormatTimeNode(dateToBeFormatted, formatString.slice(1, -1));
     }
@@ -301,7 +301,7 @@ variable to be resolved, and then call ``variable.resolve(context)``. So,
 for example:
 
 
-    var {Variable} = require("reinhard/variable");
+    var {Variable} = require("reinhardt/variable");
     var FormatTimeNode = function(dateToBeFormatted, formatString) {
       this.dateToBeFormatted = new Variable(dateToBeFormatted, formatString)
       return this;

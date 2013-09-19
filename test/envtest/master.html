@@ -1,3 +1,9 @@
 Master: {% echofoo %}
 {% block child %}
 {% endblock %}
+{% comment %} env needs to be passed down to other nodelists {% endcomment %}
+{% if true %}
+	{% if true %}
+		{% echofoo %}
+	{% endif %}
+{% endif %}

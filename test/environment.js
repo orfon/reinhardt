@@ -45,12 +45,16 @@ exports.testEnvConfig = function() {
 	var templates = new Environment({
 		loader: module.resolve('./envtest/'),
 		tags: echoTagModule,
-		debug: true,
+		debug: false,
 		foo: 'bar'
 	});
 
+	// child extends master.html, we check whether the env
+	// is available in the master template.
+	// Additionally the env needs to be passed down any nodelist (that's why
+	// there are so many nested if-blocks %}
 	var t = templates.getTemplate('child.html');
-	assert.equal(t.render(), 'Master: bar\n\nChild: bar\n');
+	assert.equal(t.render(), 'Master: bar\n\nChild: bar\n\n\n\n\t\n\t\tbar\n\t\n');
 
 	// passing everything in as array should give same result
 	templates = new Environment({
@@ -60,6 +64,6 @@ exports.testEnvConfig = function() {
 		foo: 'bar'
 	});
 	var t = templates.getTemplate('child.html');
-	assert.equal(t.render(), 'Master: bar\n\nChild: bar\n');
+	assert.equal(t.render(), 'Master: bar\n\nChild: bar\n\n\n\n\t\n\t\tbar\n\t\n');
 
 }

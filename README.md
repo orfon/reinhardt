@@ -44,14 +44,14 @@ to your application:
 
 # Documentation
 
-  * [Quickstart guide](docs/quickstart.md)
-  * [Reinhardt template language overview](docs/templates.md)
+  * [Quickstart guide](./docs/quickstart.md)
+  * [Reinhardt template language overview](./docs/templates.md)
   * References for the built in
-    * [Tags](docs/tags.md)
-    * [Filters](docs/filters.md)
+    * [Tags](./docs/tags.md)
+    * [Filters](./docs/filters.md)
   * Extending Reinhardt
-    * [Custom template filters](docs/custom-template-filters.md)
-    * [Custom template tags](docs/custom-template-tags.md)
+    * [Custom template filters](./docs/custom-template-filters.md)
+    * [Custom template tags](./docs/custom-template-tags.md)
 
 # Speed
 

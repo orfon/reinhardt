@@ -1,5 +1,4 @@
-Reinhardt - Django templates for RingoJs
-=============================================
+# Reinhardt - Django templates for RingoJs
 
 This is a JavaScript implementation of the Django Template System as described in <http://www.djangoproject.com/documentation/templates/> for RingoJs.
 
@@ -11,8 +10,7 @@ Reinhard already implements the larger part of the Django templating system:
   * customize and extend - writing tags and filters
   * tons of unit tests - our unit tests are copied straight from django
 
-Small example
-===============
+## Small example
 
 Demonstration of a small Reinhardt template:
 
@@ -26,8 +24,7 @@ Demonstration of a small Reinhardt template:
       </ul>
     {% endblock %}
 
-Quickstart
-============
+# Quickstart
 
 Create a templates environment and render a template:
 
@@ -45,9 +42,7 @@ to your application:
 
     app.configure(require('reinhardt/middleware'), 'route')
 
-
-Documentation
-=========================
+# Documentation
 
   * [Quickstart guide](docs/quickstart.md)
   * [Reinhardt template language overview](docs/templates.md)
@@ -58,7 +53,6 @@ Documentation
     * [Custom template filters](docs/custom-template-filters.md)
     * [Custom template tags](docs/custom-template-tags.md)
 
-Speed
-======
+# Speed
 
 There is a `examples/speed.js` which is farily easy to read. On my machine with the use-cases I have, reinhardt is roughly the same speed as the original Django template language.

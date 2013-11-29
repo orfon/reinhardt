@@ -3,6 +3,18 @@ Writing custom template tags
 
 Tags are more complex than filters, because tags can do anything.
 
+**Table of Contents**
+
+- [A quick overview](#a-quick-overview)
+- [Writing the compilation function](#writing-the-compilation-function)
+- [Writing the renderer](#writing-the-renderer)
+- [Auto-escaping considerations](#auto-escaping-considerations)
+- [Thread-safety considerations](#thread-safety-considerations)
+- [Passing template variables to the tag](#passing-template-variables-to-the-tag)
+- [Setting a variable in the context](#setting-a-variable-in-the-context)
+- [Parsing until another block tag](#parsing-until-another-block-tag)
+- [Parsing until another block tag, and saving contents](#parsing-until-another-block-tag-and-saving-contents)
+
 A quick overview
 --------------------
 

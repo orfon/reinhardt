@@ -145,9 +145,7 @@ For example:
 
     {{ value|date:"D d M Y" }}
 
-If ``value`` is a ``Date`` object (e.g., the result of
-``new Date()``), the output will be the string
-``'Wed 09 Jan 2008'``.
+``value`` can be a JavaScript ``Date`` or ``java.util.Date`` instance as well as a unix timestamp. If ``value`` is a ``String`` it is parsed by Ringo's [date parser](http://ringojs.org/api/master/ringo/utils/dates/#parse).
 
 
 default

@@ -273,7 +273,6 @@ exports.testFilters = function() {
        var env = new Environment({debug: debug});
        for (var key in tests) {
            var test = tests[key];
-           print (key, 'debug:', debug);
            if (test[2] == Error) {
                  assert.throws(function() {
                              var t = new Template(test[0], env);

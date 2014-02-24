@@ -914,7 +914,6 @@ exports.testBasic = function() {
          var env = new Environment({loader: new TestTemplateLoader(), debug: debug})
          for (var key in tests) {
                var test = tests[key];
-               print (key, 'debug:', debug);
                if (test[2] == Error) {
                      assert.throws(function() {
                                  var t = env.getTemplate(key);

@@ -4,11 +4,11 @@ This is a JavaScript implementation of the Django Template System as described i
 
 Reinhard already implements the larger part of the Django templating system:
 
-  * all iteration and conditional tags (if/else, loops, etc)
-  * most other filters and tags (see table below)
+  * all iteration and conditional tags (if/else, loops, etc).
+  * most other [filters](./docs/filters.md) and [tags](./docs/tags.md).
   * autoescaping
-  * customize and extend - writing tags and filters
-  * tons of unit tests - our unit tests are copied straight from django
+  * customize and extend. Write your own tags and filters.
+  * tons of unit tests. Our unit tests are copied straight from django.
 
 ## Small example
 

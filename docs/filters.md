@@ -39,7 +39,6 @@ This document describes Reinhardt's built-in template filters.
 - [title](#title)
 - [truncatechars](#truncatechars)
 - [truncatewords](#truncatewords)
-- [truncatewords_html](#truncatewords_html)
 - [upper](#upper)
 - [wordcount](#wordcount)
 - [wordwrap](#wordwrap)
@@ -607,29 +606,6 @@ For example:
 If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is ..."``.
 
 Newlines within the string will be removed.
-
-
-
-truncatewords_html
-------
-
-Similar to `truncatewords`, except that it is aware of HTML tags. Any
-tags that are opened in the string and not closed before the truncation point,
-are closed immediately after the truncation.
-
-This is less efficient than `truncatewords`, so should only be used
-when it is being passed HTML text.
-
-For example:
-
-    {{ value|truncatewords_html:2 }}
-
-If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
-``"<p>Joel is ...</p>"``.
-
-Newlines in the HTML content will be preserved.
-
-
 
 upper
 ------

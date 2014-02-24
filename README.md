@@ -6,7 +6,7 @@ Reinhard already implements the larger part of the Django templating system:
 
   * all iteration and conditional tags (if/else, loops, etc).
   * most other [filters](./docs/filters.md) and [tags](./docs/tags.md).
-  * autoescaping
+  * [autoescaping](./docs/templates.md#automatic-html-escaping)
   * customize and extend. Write your own tags and filters.
   * tons of unit tests. Our unit tests are copied straight from django.
 

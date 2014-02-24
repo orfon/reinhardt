@@ -52,6 +52,7 @@ interpreted as-is on the client side. Internally, these strings are instances
 of `String` with the property `isSafe=true` attached. You can test for them
 using code like:
 
+
      var {isSafe} = require('reinhardt/utils');
      isSafe(fooString)
 

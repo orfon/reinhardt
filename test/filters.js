@@ -262,6 +262,7 @@ exports.testFilters = function() {
         // how to? 'date06': ['{{ d|date:"e" }}', {'d': new Date(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'],
         'date07': ['{{ d|date:"e" }}', {'d': new Date(2009, 3, 12)}, ''],
         'date08': ['{{ d|date:"dd.MM.yyyy" }}', {'d': 0}, '01.01.1970'],
+        'date09': ['{{ d|date:"dd.MM.yyyy" }}', {'d': 1393235825110}, '24.02.2014'],
         'filter-first01': ['{{ a|first }} {{ b|first }}', {"a": ["a&b", "x"], "b": [markSafe("a&b"), "x"]}, "a&amp;b a&b"],
         'filter-first02': ['{% autoescape off %}{{ a|first }} {{ b|first }}{% endautoescape %}', {"a": ["a&b", "x"], "b": [markSafe("a&b"), "x"]}, "a&b a&b"],
 

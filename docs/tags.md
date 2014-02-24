@@ -327,7 +327,7 @@ As you can see, the ``if`` tag may take one or several ``{% elif %}``
 clauses, as well as an ``{% else %}`` clause that will be displayed if all
 previous conditions fail. These clauses are optional.
 
-The ``if`` tag is very expressive, see [if-details] for details.
+The ``if`` tag is very expressive, see the [If details](if-details.md) page for details.
 
 
 ifchanged

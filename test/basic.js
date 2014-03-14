@@ -44,6 +44,16 @@ var TestObj = function() {
       return this;
 }
 
+exports.testIncludeTemplateArgument = function() {
+      // any object having render() can be included as template
+      var ctx = {
+            tmpl: new Template('This worked!')
+      };
+      var outerTmpl = new Template('{% include tmpl %}');
+      var output = outerTmpl.render(ctx);
+      assert.equal(output, 'This worked!');
+
+}
 exports.testBasic = function() {
 
       // register fake template loader for `include` testing later on

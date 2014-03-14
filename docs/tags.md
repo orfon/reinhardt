@@ -428,6 +428,10 @@ the variable ``template_name``:
 
     {% include template_name %}
 
+The variable may also be an object with a `render()` method that
+accepts a context. This allows you to reference a compiled `Template` in
+your context.
+
 An included template is rendered with the context of the template that's
 including it. This example produces the output ``"Hello, John"``:
 

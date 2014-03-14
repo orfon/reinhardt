@@ -73,11 +73,12 @@ sections, although that has a special meaning, as indicated below.
 Importantly, *you cannot have spaces or punctuation characters in variable
 names.*
 
-In the above example, ``{{ section.title }}`` will be replaced with the
-``title`` attribute of the ``section`` object.
+In the above example, `{{ section.title }}` will be replaced with the
+`title` attribute of the ``section`` object.
 
 If you use a variable that doesn't exist, the template system will insert
-"INVALID".
+the value of the `stringIfUndefined`, which is set to `''` (the empty string)
+by default.
 
 Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
 interpreted as a literal string and not using the value of the variable "bar",

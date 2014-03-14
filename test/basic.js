@@ -4,6 +4,7 @@ var {Template} = require('../lib/template');
 var {Context} = require('../lib/context');
 var {markSafe} = require('../lib/utils');
 var {Environment} = require('../lib/environment');
+var {TemplateSyntaxError, TemplateDoesNotExist} = require('../lib/errors');
 /**
  * Utility classes
  */
@@ -71,7 +72,7 @@ exports.testBasic = function() {
             'basic-syntax03': ["{{ first }} --- {{ second }}", {"first" : 1, "second" : 2}, "1 --- 2"],
 
             //Fail silently when a variable is not found in the current context
-            'basic-syntax04': ["as{{ missing }}df", {}, ("asdf","asINVALIDdf")],
+            'basic-syntax04': ["as{{ missing }}df", {}, ["asdf","asINVALIDdf"]],
 
             //A variable may not contain more than one word
             'basic-syntax06': ["{{ multi word variable }}", {}, Error],
@@ -87,7 +88,7 @@ exports.testBasic = function() {
             'basic-syntax10': ["{{ var.otherclass.method }}", {"var": new SomeClass()}, "OtherClass.method"],
 
             //Fail silently when a variable's attribute isn't found
-            'basic-syntax11': ["{{ var.blech }}", {"var": new SomeClass()}, "INVALID"],
+            'basic-syntax11': ["{{ var.blech }}", {"var": new SomeClass()}, ["", "INVALID"]],
 
             //Raise TemplateSyntaxError when trying to access a variable beginning with an underscore
             // FIXME i don't do that
@@ -104,7 +105,7 @@ exports.testBasic = function() {
             'basic-syntax18': ["{{ foo.bar }}", {"foo" : {"bar" : "baz"}}, "baz"],
 
             //Fail silently when a variable's dictionary key isn't found
-            'basic-syntax19': ["{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, "INVALID"],
+            'basic-syntax19': ["{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, ["", "INVALID"]],
 
             //Fail silently when accessing a non-simple method
             // FIXME what?
@@ -117,7 +118,7 @@ exports.testBasic = function() {
 
             //Will try to treat "moo #} {{ cow" as the variable. Not ideal, but
             //costly to work around, so this triggers an error.
-            'basic-syntax23': ["{{ moo #} {{ cow }}", {"cow": "cow"}, Error],
+            'basic-syntax23': ["{{ moo #} {{ cow }}", {"cow": "cow"}, TemplateSyntaxError],
 
             //Embedded newlines make it not-a-tag.
             'basic-syntax24': ["{{ moo\n }}", {}, "{{ moo\n }}"],
@@ -165,13 +166,13 @@ exports.testBasic = function() {
             'list-index01': ["{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"],
 
             //Fail silently when the list index is out of range.
-            'list-index02': ["{{ var.5 }}", {"var": ["first item", "second item"]}, ("", "INVALID")],
+            'list-index02': ["{{ var.5 }}", {"var": ["first item", "second item"]}, ["", "INVALID"]],
 
             //Fail silently when the variable is not a subscriptable object.
-            'list-index03': ["{{ var.1 }}", {"var": undefined}, "INVALID"],
+            'list-index03': ["{{ var.1 }}", {"var": undefined}, ["", "INVALID"]],
 
             //Fail silently when variable is a dict without the specified key.
-            'list-index04': ["{{ var.1 }}", {"var": {}}, "INVALID"],
+            'list-index04': ["{{ var.1 }}", {"var": {}}, ["", "INVALID"]],
 
             //Dictionary lookup wins out when dict's key is a string.
             'list-index05': ["{{ var.1 }}", {"var": {'1': "hello"}}, "hello"],
@@ -225,17 +226,17 @@ exports.testBasic = function() {
             'for-tag-unpack03': ["{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
             'for-tag-unpack04': ["{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
             'for-tag-unpack05': ["{% for key ,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
-            'for-tag-unpack06': ["{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, Error],
-            'for-tag-unpack07': ["{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, Error],
-            'for-tag-unpack08': ["{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, Error],
+            'for-tag-unpack06': ["{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, TemplateSyntaxError],
+            'for-tag-unpack07': ["{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, TemplateSyntaxError],
+            'for-tag-unpack08': ["{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, TemplateSyntaxError],
             //Ensure that a single loopvar doesn't truncate the list in val.
             'for-tag-unpack09': ["{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1/two:2/"],
             //Otherwise, silently truncate if the length of loopvars differs to the length of each set of items.
             'for-tag-unpack10': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2, 'orange']]}, "one:1/two:2/"],
-            'for-tag-unpack11': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, "one:1,INVALID/two:2,INVALID/"],
-            'for-tag-unpack12': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2]]}, "one:1,carrot/two:2,INVALID/"],
+            'for-tag-unpack11': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1], ['two', 2]]}, ["one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/"]],
+            'for-tag-unpack12': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2]]}, ["one:1,carrot/two:2,/", "one:1,carrot/two:2,INVALID/"]],
             'for-tag-unpack13': ["{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": [['one', 1, 'carrot'], ['two', 2, 'cheese']]}, "one:1,carrot/two:2,cheese/"],
-            'for-tag-unpack14': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [1, 2]}, "INVALID:INVALID/INVALID:INVALID/"],
+            'for-tag-unpack14': ["{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": [1, 2]}, [":/:/", "INVALID:INVALID/INVALID:INVALID/"]],
             'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
             'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
@@ -257,16 +258,16 @@ exports.testBasic = function() {
             'filter-syntax04': ["{{ var| upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"],
 
             //Raise TemplateSyntaxError for a nonexistent filter
-            'filter-syntax05': ["{{ var|does_not_exist }}", {}, Error],
+            'filter-syntax05': ["{{ var|does_not_exist }}", {}, TemplateSyntaxError],
 
             //Raise TemplateSyntaxError when trying to access a filter containing an illegal character
-            'filter-syntax06': ["{{ var|fil(ter) }}", {}, Error],
+            'filter-syntax06': ["{{ var|fil(ter) }}", {}, TemplateSyntaxError],
 
             //Raise TemplateSyntaxError for invalid block tags
-            'filter-syntax07': ["{% nothing_to_see_here %}", {}, Error],
+            'filter-syntax07': ["{% nothing_to_see_here %}", {}, TemplateSyntaxError],
 
             //Raise TemplateSyntaxError for empty block tags
-            'filter-syntax08': ["{% %}", {}, Error],
+            'filter-syntax08': ["{% %}", {}, TemplateSyntaxError],
 
             //Chained filters, with an argument to the first one
             'filter-syntax09': ['{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"],
@@ -284,7 +285,7 @@ exports.testBasic = function() {
 
             //Fail silently for methods that raise an exception with a
             //"silent_variable_failure" attribute
-            'filter-syntax13': ['1{{ var.method3 }}2', {"var": new SomeClass()}, ("12", "1INVALID2")],
+            'filter-syntax13': ['1{{ var.method3 }}2', {"var": new SomeClass()}, ["12", "1INVALID2"]],
 
             //In methods that raise an exception without a
             //"silent_variable_attribute" set to true, the exception propagates
@@ -318,14 +319,14 @@ exports.testBasic = function() {
 
             //Fail silently for non-callable attribute and dict lookups which
             //raise an exception with a "silent_variable_failure" attribute
-            'filter-syntax21': ['1{{ var.silent_fail_key }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
-            'filter-syntax22': ['1{{ var.silent_fail_attribute }}2', {"var": SomeClass()}, ("12", "1INVALID2")],
+            'filter-syntax21': ['1{{ var.silent_fail_key }}2', {"var": SomeClass()}, ["12", "1INVALID2"]],
+            'filter-syntax22': ['1{{ var.silent_fail_attribute }}2', {"var": SomeClass()}, ["12", "1INVALID2"]],
 
             //INCLUDE TAG ###########################################################
             'include01': ['{% include "basic-syntax01" %}', {}, "something cool"],
             'include02': ['{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"],
             'include03': ['{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"],
-            'include04': ['a{% include "nonexistent" %}b', {}, Error],
+            'include04': ['a{% include "nonexistent" %}b', {}, TemplateDoesNotExist],
             'include 05': ['template with a space', {}, 'template with a space'],
             'include06': ['{% include "include 05"%}', {}, 'template with a space'],
 
@@ -335,20 +336,20 @@ exports.testBasic = function() {
             'include09': ['{{ first }}--{% include "basic-syntax03" with first=second|lower|upper second=first|upper %}--{{ second }}', {'first': 'Ul', 'second': 'lU'}, 'Ul--LU --- UL--lU'],
 
             //isolated context
-            'include10': ['{% include "basic-syntax03" only %}', {'first': '1'}, 'INVALID --- INVALID'],
-            'include11': ['{% include "basic-syntax03" only with second=2 %}', {'first': '1'}, 'INVALID --- 2'],
-            'include12': ['{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, '1 --- INVALID'],
+            'include10': ['{% include "basic-syntax03" only %}', {'first': '1'}, [' --- ', 'INVALID --- INVALID']],
+            'include11': ['{% include "basic-syntax03" only with second=2 %}', {'first': '1'}, [' --- 2', 'INVALID --- 2']],
+            'include12': ['{% include "basic-syntax03" with first=1 only %}', {'second': '2'}, ['1 --- ', '1 --- INVALID']],
 
             //autoescape context
-            'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, '& --- INVALID'],
-            'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, '& --- INVALID'],
+            'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, ['& --- ', '& --- INVALID']],
+            'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, ['& --- ', '& --- INVALID']],
 
-            'include-error01': ['{% include "basic-syntax01" with %}', {}, Error],
-            'include-error02': ['{% include "basic-syntax01" with "no key" %}', {}, Error],
-            'include-error03': ['{% include "basic-syntax01" with dotted.arg="error" %}', {}, Error],
-            'include-error04': ['{% include "basic-syntax01" something_random %}', {}, Error],
-            'include-error05': ['{% include "basic-syntax01" foo="duplicate" foo="key" %}', {}, Error],
-            'include-error06': ['{% include "basic-syntax01" only only %}', {}, Error],
+            'include-error01': ['{% include "basic-syntax01" with %}', {}, TemplateSyntaxError],
+            'include-error02': ['{% include "basic-syntax01" with "no key" %}', {}, TemplateSyntaxError],
+            'include-error03': ['{% include "basic-syntax01" with dotted.arg="error" %}', {}, TemplateSyntaxError],
+            'include-error04': ['{% include "basic-syntax01" something_random %}', {}, TemplateSyntaxError],
+            'include-error05': ['{% include "basic-syntax01" foo="duplicate" foo="key" %}', {}, TemplateSyntaxError],
+            'include-error06': ['{% include "basic-syntax01" only only %}', {}, TemplateSyntaxError],
 
 
             //IFEQUAL TAG ###########################################################
@@ -413,10 +414,10 @@ exports.testBasic = function() {
             'namedendblocks01': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'],
 
             //Unbalanced blocks
-            'namedendblocks02': ["1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, Error],
-            'namedendblocks03': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, Error],
-            'namedendblocks04': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, Error],
-            'namedendblocks05': ["1{% block first %}_{% block second %}2{% endblock first %}", {}, Error],
+            'namedendblocks02': ["1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, TemplateSyntaxError],
+            'namedendblocks03': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, TemplateSyntaxError],
+            'namedendblocks04': ["1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, TemplateSyntaxError],
+            'namedendblocks05': ["1{% block first %}_{% block second %}2{% endblock first %}", {}, TemplateSyntaxError],
 
             //Mixed named and unnamed endblocks
             'namedendblocks06': ["1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'],
@@ -544,13 +545,13 @@ exports.testBasic = function() {
 
 
             //Raise exception for invalid template name
-            'exception01': ["{% extends 'nonexistent' %}", {}, Error],
+            'exception01': ["{% extends 'nonexistent' %}", {}, TemplateDoesNotExist],
 
             //Raise exception for invalid template name (in variable)
-            'exception02': ["{% extends nonexistent %}", {}, Error],
+            'exception02': ["{% extends nonexistent %}", {}, TemplateDoesNotExist],
 
             //Raise exception for extra {% extends %} tags
-            'exception03': ["{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% extends 'inheritance16' %}", {}, Error],
+            'exception03': ["{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% extends 'inheritance16' %}", {}, TemplateSyntaxError],
 
             //IF TAG ################################################################
             'if-tag01': ["{% if foo %}yes{% else %}no{% endif %}", {"foo": true}, "yes"],
@@ -693,13 +694,13 @@ exports.testBasic = function() {
 
 
             //CYCLE TAG #############################################################
-            'cycle01': ['{% cycle a %}', {}, Error],
+            'cycle01': ['{% cycle a %}', {}, TemplateSyntaxError],
             'cycle02': ['{% cycle a,b,c as abc %}{% cycle abc %}', {}, 'ab'],
             'cycle03': ['{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}', {}, 'abc'],
             'cycle04': ['{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}', {}, 'abca'],
-            'cycle05': ['{% cycle %}', {}, Error],
-            'cycle06': ['{% cycle a %}', {}, Error],
-            'cycle07': ['{% cycle a,b,c as foo %}{% cycle bar %}', {}, Error],
+            'cycle05': ['{% cycle %}', {}, TemplateSyntaxError],
+            'cycle06': ['{% cycle a %}', {}, TemplateSyntaxError],
+            'cycle07': ['{% cycle a,b,c as foo %}{% cycle bar %}', {}, TemplateSyntaxError],
             'cycle08': ['{% cycle a,b,c as foo %}{% cycle foo %}{{ foo }}{{ foo }}{% cycle foo %}{{ foo }}', {}, 'abbbcc'],
             'cycle09': ["{% for i in test %}{% cycle a,b %}{{ i }},{% endfor %}", {'test': [0,1,2,3,4]}, 'a0,b1,a2,b3,a4,'],
             'cycle10': ["{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}", {}, 'ab'],
@@ -710,7 +711,7 @@ exports.testBasic = function() {
             'cycle15': ["{% for i in test %}{% cycle aye bee %}{{ i }},{% endfor %}", {'test': [0,1,2,3,4], 'aye': 'a', 'bee': 'b'}, 'a0,b1,a2,b3,a4,'],
             'cycle16': ["{% cycle one|lower two as foo %}{% cycle foo %}", {'one': 'A','two': '2'}, 'a2'],
             'cycle17': ["{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""],
-            'cycle18': ["{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, Error],
+            'cycle18': ["{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, TemplateSyntaxError],
             'cycle19': ["{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"],
             'cycle20': ["{% cycle one two as foo %} &amp; {% cycle foo %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"],
             //'cycle21': ["{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one' : 'A & B', 'two' : 'C & D'}, "A &amp; B &amp; C &amp; D"],
@@ -763,10 +764,10 @@ exports.testBasic = function() {
             'filter02': ['{% filter upper %}django{% endfilter %}', {}, 'DJANGO'],
             'filter03': ['{% filter upper|lower %}django{% endfilter %}', {}, 'django'],
             'filter04': ['{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'],
-            'filter05': ['{% filter safe %}fail{% endfilter %}', {}, Error],
-            'filter05bis': ['{% filter upper|safe %}fail{% endfilter %}', {}, Error],
-            'filter06': ['{% filter escape %}fail{% endfilter %}', {}, Error],
-            'filter06bis': ['{% filter upper|escape %}fail{% endfilter %}', {}, Error],
+            'filter05': ['{% filter safe %}fail{% endfilter %}', {}, TemplateSyntaxError],
+            'filter05bis': ['{% filter upper|safe %}fail{% endfilter %}', {}, TemplateSyntaxError],
+            'filter06': ['{% filter escape %}fail{% endfilter %}', {}, TemplateSyntaxError],
+            'filter06bis': ['{% filter upper|escape %}fail{% endfilter %}', {}, TemplateSyntaxError],
 
             //FIRSTOF TAG ###########################################################
             'firstof01': ['{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''],
@@ -777,7 +778,7 @@ exports.testBasic = function() {
             'firstof06': ['{% firstof a b c %}', {'b':0,'c':3}, '3'],
             'firstof07': ['{% firstof a b "c" %}', {'a':0}, 'c'],
             'firstof08': ['{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'],
-            'firstof09': ['{% firstof %}', {}, Error],
+            'firstof09': ['{% firstof %}', {}, TemplateSyntaxError],
 
             'firstof11': ['{% firstof a b %}', {'a': '<', 'b': '>'}, '&lt;'],
             'firstof12': ['{% firstof a b %}', {'a': '', 'b': '>'}, '&gt;'],
@@ -843,7 +844,7 @@ exports.testBasic = function() {
             'verbatim-tag01': ['{% verbatim %}{{bare   }}{% endverbatim %}', {}, '{{bare   }}'],
             'verbatim-tag02': ['{% verbatim %}{% endif %}{% endverbatim %}', {}, '{% endif %}'],
             'verbatim-tag03': ["{% verbatim %}It's the {% verbatim %} tag{% endverbatim %}", {}, "It's the {% verbatim %} tag"],
-            'verbatim-tag04': ['{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}', {}, Error],
+            'verbatim-tag04': ['{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}', {}, TemplateSyntaxError],
             'verbatim-tag05': ['{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}', {}, ''],
             'verbatim-tag06': ["{% verbatim special %}Don't {% endverbatim %} just yet{% endverbatim special %}", {}, "Don't {% endverbatim %} just yet"],
 
@@ -852,14 +853,14 @@ exports.testBasic = function() {
             // WONTFIX no legacy support
             // 'legacywith01': ['{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, '50'],
 
-            'with02': ['{{ key }}{% with key=dict.key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, 'INVALID50-50-50INVALID'],
+            'with02': ['{{ key }}{% with key=dict.key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, ['50-50-50', 'INVALID50-50-50INVALID']],
             // WONTFIX not legacy support
             // 'legacywith02': ['{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key': 50}}, 'INVALID50-50-50INVALID'],
 
             'with03': ['{% with a=alpha b=beta %}{{ a }}{{ b }}{% endwith %}', {'alpha': 'A', 'beta': 'B'}, 'AB'],
 
-            'with-error01': ['{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, Error],
-            'with-error02': ['{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, Error],
+            'with-error01': ['{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, TemplateSyntaxError],
+            'with-error02': ['{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key': 50}}, TemplateSyntaxError],
 
             //LOADING TAG LIBRARIES #################################################
             'load01': ["{% loadtag ./fakepackage/tags %}{% echo test %} {% echo2 test %}", {}, "test test"],
@@ -873,10 +874,10 @@ exports.testBasic = function() {
             'load05': ["{% loadfilter upper from ./fakepackage/filters %}{{ statement|upper }}", {'statement': 'not shouting'}, 'NOT SHOUTING'],
 
             //{% load %} tag errors
-            'load09': ["{% loadtag from ./fakepackage/tags %}", {}, Error],
-            'load09b': ["{% loadfilter from ./fakepackage/tags %}", {}, Error],
-            'load10': ["{% loadtag echo from bad_library %}", {}, Error],
-            'load11': ["{% loadfilter echo from bad_library %}", {}, Error],
+            'load09': ["{% loadtag from ./fakepackage/tags %}", {}, TemplateSyntaxError],
+            'load09b': ["{% loadfilter from ./fakepackage/tags %}", {}, TemplateSyntaxError],
+            'load10': ["{% loadtag echo from bad_library %}", {}, TemplateSyntaxError],
+            'load11': ["{% loadfilter echo from bad_library %}", {}, TemplateSyntaxError],
 
             // WIDTHRATIO TAG ########################################################
             'widthratio01': ['{% widthratio a b 0 %}', {'a':50,'b':100}, '0'],
@@ -893,7 +894,7 @@ exports.testBasic = function() {
 
             // Raise exception if we don't have 3 args, last one an integer
             'widthratio08': ['{% widthratio %}', {}, Error],
-            'widthratio09': ['{% widthratio a b %}', {'a':50,'b':100}, Error],
+            'widthratio09': ['{% widthratio a b %}', {'a':50,'b':100}, TemplateSyntaxError],
             'widthratio10': ['{% widthratio a b 100.0 %}', {'a':50,'b':100}, '50'],
 
             // #10043: widthratio should allow max_width to be a variable
@@ -904,31 +905,67 @@ exports.testBasic = function() {
             'widthratio12b': ['{% widthratio a b c %}', {'a':null,'b':100,'c':100}, ''],
             'widthratio13a': ['{% widthratio a b c %}', {'a':0,'b':'b','c':100}, ''],
             'widthratio13b': ['{% widthratio a b c %}', {'a':0,'b':null,'c':100}, ''],
-            'widthratio14a': ['{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, Error],
-            'widthratio14b': ['{% widthratio a b c %}', {'a':0,'b':100,'c':null}, Error],
+            'widthratio14a': ['{% widthratio a b c %}', {'a':0,'b':100,'c':'c'}, TemplateSyntaxError],
+            'widthratio14b': ['{% widthratio a b c %}', {'a':0,'b':100,'c':null}, TemplateSyntaxError],
+
+
+            'invalidstr01': ['{{ var|default:"Foo" }}', {}, ['Foo','INVALID']],
+            'invalidstr02': ['{{ var|defaultifnull:"Foo" }}', {}, ['','INVALID']],
+            'invalidstr03': ['{% for v in var %}({{ v }}){% endfor %}', {}, ''],
+            'invalidstr04': ['{% if var %}Yes{% else %}No{% endif %}', {}, 'No'],
+            'invalidstr04_2': ['{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'],
+            'invalidstr05': ['{{ var }}', {}, ['', ['INVALID %s', 'var']]],
+            'invalidstr06': ['{{ var.prop }}', {'var': {}}, ['', ['INVALID %s', 'var.prop']]]
       };
 
-      // run tests twice: debug=true and debug=false
-      [false, true].forEach(function(debug) {
-
-         var env = new Environment({loader: new TestTemplateLoader(), debug: debug})
-         for (var key in tests) {
-               var test = tests[key];
-               if (test[2] == Error) {
+      for (var key in tests) {
+            var test = tests[key];
+            var testTemplate = test[0];
+            var testContext = new Context(test[1]);
+            var normalStringResult = test[2];
+            var invalidStringResult = test[2];
+            if (test[2] instanceof Array) {
+               normalStringResult = test[2][0];
+               invalidStringResult = test[2][1];
+            };
+            var stringIfInvalid = 'INVALID';
+            if (invalidStringResult instanceof Array) {
+               stringIfInvalid = invalidStringResult[0];
+               invalidStringResult = invalidStringResult[0].replace('%s', invalidStringResult[1]);
+            }
+            [{
+               debug: true,
+               result: normalStringResult,
+               stringIfInvalid: '',
+            },
+            {
+               debug: false,
+               result: normalStringResult,
+               stringIfInvalid: '',
+            }, {
+               debug: false,
+               result: invalidStringResult,
+               stringIfInvalid: stringIfInvalid,
+            }].forEach(function(testSetup) {
+               var env = new Environment({
+                  loader: new TestTemplateLoader(),
+                  debug: testSetup.debug,
+                  stringIfUndefined: testSetup.stringIfInvalid
+               });
+               if (testSetup.result == Error) {
                      assert.throws(function() {
-                                 var t = env.getTemplate(key);
-                                 t.render(new Context(test[1]));
-                           },
-                           test[2],
-                           key
+                           var t = env.getTemplate(key);
+                           t.render(testContext);
+                        },
+                        testSetup.result,
+                        key
                      );
                } else {
                      var template = env.getTemplate(key);
-                     assert.strictEqual(template.render(new Context(test[1])), test[2], key);
+                     assert.strictEqual(template.render(testContext, testTemplate), testSetup.result);
                }
-         }
-      });
-
+            })
+      }// end for tests
 }
 
 

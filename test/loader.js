@@ -1,6 +1,7 @@
 var assert = require('assert');
 var {Context} = require('../lib/context');
 var {Environment} = require('../lib/environment');
+var {Template} = require("../lib/template");
 
 var MockLoader = function() {
    this.templateAccess = {
@@ -74,10 +75,35 @@ exports.testCacheLoaderCaching = function() {
    assert.equal(env.getTemplate('bar').render(c), 'bar');
    assert.equal(env.getTemplate('bar').render(c), 'bar');
    assert.equal(mockLoader.templateAccess.bar, 1);
+}
 
+exports.testOrigin = function() {
+   var env = new Environment({
+      loader: [module.resolve("./templatedir/bar/")],
+      debug: true
+   });
+
+   var template = env.getTemplate('test.html');
+   assert.equal(template.origin.loadName, 'test.html');
+   assert.equal(template.origin.dirs.length, 1);
+}
+
+exports.testStringOrigin = function() {
+   var t = new Template('string template');
+   assert.equal(t.origin.source, 'string template');
+}
+
+exports.testDebugFalseOrigin = function() {
+   var env = new Environment({
+      loader: [module.resolve("./templatedir/bar/")],
+      debug: false
+   });
+
+   var template = env.getTemplate('test.html');
+   assert.isUndefined(template.origin);
 }
 
 //start the test runner if we're called directly from command line
 if (require.main == module.id) {
-    system.exit(require('test').run(exports, arguments[1]));
+    require("system").exit(require('test').run(exports, arguments[1]));
 }

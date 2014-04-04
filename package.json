@@ -1,6 +1,6 @@
 {
     "name": "reinhardt",
-    "version": "0.2.3",
+    "version": "0.3",
     "description": "Django templates for JavaScript",
     "keywords": ["template", "web"],
     "author": {

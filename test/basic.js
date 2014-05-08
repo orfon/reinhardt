@@ -528,13 +528,13 @@ exports.testBasic = function() {
 
             //{% load %} tag (parent -- setup for exception04)
             // NOTE: in a normal environment tags are loaded from packages not with weird relative paths
-            'inheritance17': ["{% loadtag ./fakepackage/tags %}{% block first %}1234{% endblock %}", {}, '1234'],
+            //'inheritance17': ["{% loadtag ./fakepackage/tags %}{% block first %}1234{% endblock %}", {}, '1234'],
 
             //{% load %} tag (standard usage, without inheritance)
-            'inheritance18': ["{% loadtag ./fakepackage/tags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
+            //'inheritance18': ["{% loadtag ./fakepackage/tags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
 
             //{% load %} tag (within a child template)
-            'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% loadtag ./fakepackage/tags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
+            //'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% loadtag ./fakepackage/tags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
 
             //Two-level inheritance with {{ block.super }}
             'inheritance20': ["{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'],

@@ -32,6 +32,7 @@ Demonstration of a small Reinhardt template:
     * [Tags](./docs/tags.md)
     * [Filters](./docs/filters.md)
   * Extending Reinhardt
+    * [Reinhardt environment](./docs/environment.md)
     * [Custom template filters](./docs/custom-template-filters.md)
     * [Custom template tags](./docs/custom-template-tags.md)
 

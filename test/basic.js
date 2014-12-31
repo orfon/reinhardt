@@ -1,5 +1,6 @@
 var assert = require("assert");
 
+var {Token} = require("../lib/token");
 var {Template} = require('../lib/template');
 var {Context} = require('../lib/context');
 var {markSafe} = require('../lib/utils');
@@ -54,6 +55,44 @@ exports.testIncludeTemplateArgument = function() {
       assert.equal(output, 'This worked!');
 
 }
+
+exports.testSmartSplit = function() {
+
+   var tests = [
+      ['This is "a person" test.',
+          ['This', 'is', '"a person"', 'test.']],
+      ['This is "a person\'s" test.',
+          ['This', 'is', '"a person\'s"', 'test.']],
+      ['This is "a person\\"s" test.',
+          ['This', 'is', '"a person\"s"', 'test.']],
+      ['"a \'one',
+          ['"a', "'one"]],
+      ['all friends\' tests',
+          ['all', 'friends\'', 'tests']],
+      ['url search_page words="something else"',
+          ['url', 'search_page', 'words="something else"']],
+      ["url search_page words='something else'",
+          ['url', 'search_page', "words='something else'"]],
+      ['url search_page words "something else"',
+          ['url', 'search_page', 'words', '"something else"']],
+      ['url search_page words-"something else"',
+          ['url', 'search_page', 'words-"something else"']],
+      ['url search_page words=hello',
+          ['url', 'search_page', 'words=hello']],
+      ['url search_page words="something else',
+          ['url', 'search_page', 'words="something', 'else']],
+      ["cut:','|cut:' '",
+          ["cut:','|cut:' '"]],
+      ["a b c d",
+          ['a', 'b', 'c', 'd']],
+   ];
+
+   tests.forEach(function(test) {
+      var t = new Token(null, test[0]);
+      assert.deepEqual(t.splitContents(), test[1]);
+   })
+};
+
 exports.testBasic = function() {
 
       // register fake template loader for `include` testing later on
@@ -354,6 +393,10 @@ exports.testBasic = function() {
             'include13': ['{% autoescape off %}{% include "basic-syntax03" %}{% endautoescape %}', {'first': '&'}, ['& --- ', '& --- INVALID']],
             'include14': ['{% autoescape off %}{% include "basic-syntax03" with first=var1 only %}{% endautoescape %}', {'var1': '&'}, ['& --- ', '& --- INVALID']],
 
+            //include arguments with spaces and quotes
+            'include15': ['{% include "basic-syntax02" with headline="In li ne" %}', {}, 'In li ne'],
+            'include16': ['{% include "basic-syntax02" with headline="\'Inl ine\'" %}', {}, "'Inl ine'"],
+
             'include-error01': ['{% include "basic-syntax01" with %}', {}, TemplateSyntaxError],
             'include-error02': ['{% include "basic-syntax01" with "no key" %}', {}, TemplateSyntaxError],
             'include-error03': ['{% include "basic-syntax01" with dotted.arg="error" %}', {}, TemplateSyntaxError],
@@ -485,13 +528,13 @@ exports.testBasic = function() {
 
             //{% load %} tag (parent -- setup for exception04)
             // NOTE: in a normal environment tags are loaded from packages not with weird relative paths
-            'inheritance17': ["{% loadtag ./fakepackage/tags %}{% block first %}1234{% endblock %}", {}, '1234'],
+            //'inheritance17': ["{% loadtag ./fakepackage/tags %}{% block first %}1234{% endblock %}", {}, '1234'],
 
             //{% load %} tag (standard usage, without inheritance)
-            'inheritance18': ["{% loadtag ./fakepackage/tags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
+            //'inheritance18': ["{% loadtag ./fakepackage/tags %}{% echo this that theother %}5678", {}, 'this that theother5678'],
 
             //{% load %} tag (within a child template)
-            'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% loadtag ./fakepackage/tags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
+            //'inheritance19': ["{% extends 'inheritance01' %}{% block first %}{% loadtag ./fakepackage/tags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'],
 
             //Two-level inheritance with {{ block.super }}
             'inheritance20': ["{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'],

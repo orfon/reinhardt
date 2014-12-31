@@ -1,37 +1,50 @@
 Quickstart Guide
 ===================
 
-Install reinhardt with Ringo's admin command:
+Install reinhardt with [rp](https://github.com/grob/rp/wiki):
 
-     $ ringo-admin install oberhamsi/reinhardt
+     $ rp install --global reinhardt
 
-The most basic way to render a template is to instantiate it from a string:
+Create a template from a String and render it:
 
     >> var template = new Template('Hello {{ username}}');
     >> template.render({username: 'Reinhardt'});
     'Hello Reinhardt'
 
-A templating `Environment` allows you to configure additional tags and filters,
-which will be available in all templates loaded through the environment. You will
-typically use an Environment for anything but very simple applications:
+A Reinhardt environment
+---------------
 
-    >> var env = new Environment({
+A Reinhardt environment makes it easy to load templates from the filesystem.
+You can also define additional tags and filters per Reinhardt,
+which will be available in all templates.
+
+The following code creates an Environment which
+loads files from the "./templates" directory and has additional filters as defined 
+in the module "./mycustomfilters":
+
+    >> var {Reinhardt} = require('reinhardt');
+    >> var templates = new Reinhardt({
          loader: module.resolve('./templates/'),
          filters: require('./mycustomfilters')
-
       });
-    >> env.renderResponse("index.html", context)
+    >> templates.renderResponse("index.html", context)
     {"status": 200, body: ["<html>..."]}
+
+Also see the help page on [Reinhardt environments](./environment.md) for more information.
 
 Debugging templates
 ---------------------
 
-Enable debugging in the environment and put the reinhardt middleware into your application:
+During development reinhardt can display detailed template error pages with the relevant template source,
+the line number and additional information such as the origin from which the template
+was loaded.
 
-    >> app.configure(require('reinhardt/middleware'));
-    >> var env = new Environment({
+For the detailed error pages, you need to add the reinhardt middleware to your [Stick application](http://github.com/ringo/stick):
+
+    >> app.configure(require('reinhardt'));
+
+and add the debugging flag to your Reinhardt environment:
+
+    >> var templates = new Reinhardt({
          debug: true
        });
-
-Debugging is disabled by default and you should not enable it in production since it displays
-the source and location of your templates.

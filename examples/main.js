@@ -1,10 +1,10 @@
-var {Environment} = require('reinhardt');
+var {Reinhardt} = require('reinhardt');
+var {Loader} = require('reinhardt/loaders/filesystem');
 var {Application} = require('stick');
 
 var app = exports.app = Application();
-// for easier template debugging
-// include the reinhard/middleware
-app.configure(require("reinhardt/middleware"), "route");
+// for easier template debugging put "reinhardt" as the first middleware:
+app.configure(require('reinhardt'), "route");
 
 var context = {
    links: [
@@ -15,9 +15,8 @@ var context = {
    djangoImage: require('ringo/base64').encode(require('fs').read(module.resolve('./static/django-reinhardt.jpg'), {binary: true}))
 }
 
-var templates = new Environment({
-   loader: [module.resolve('./templates/'), module.resolve('./templates2')],
-   debug: true
+var templates = new Reinhardt({
+   loader: new Loader(module.resolve('./templates/'), module.resolve('./templates2'))
 });
 
 app.get('/', function() {

@@ -38,10 +38,11 @@ Demonstration of a small Reinhardt template:
 
 # Quickstart
 
-Create a templates environment and render a template:
+Create a Reinhardt template environment, which loads templates from
+the filesystem and render a template:
 
-    var {Environment} = require('reinhardt');
-    var templates = new Environment({
+    var {Reinhardt} = require('reinhardt');
+    var templates = new Reinhardt({
       loader: '/path/to/templates/',
       debug: true
     });
@@ -49,10 +50,15 @@ Create a templates environment and render a template:
     var template = templates.getTemplate('index.html');
     var html = template.render({"hello": "world"});
 
-For easier template debugging, add the reinhardt middleware
-to your application:
+    // or for convinience the template environment
+    // an return a 200 response with the template as the
+    // response body
+    template.renderResponse({"hello": "other world"})
 
-    app.configure(require('reinhardt/middleware'), 'route')
+For easier template debugging, add the reinhardt middleware
+to your Stick application:
+
+    app.configure(require('reinhardt'), 'route')
 
 # Speed
 

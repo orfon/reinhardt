@@ -1,6 +1,6 @@
 {
     "name": "reinhardt",
-    "version": "0.3",
+    "version": "0.4",
     "description": "Django templates for JavaScript",
     "keywords": ["template", "web"],
     "author": {
@@ -17,7 +17,7 @@
     }],
     "repositories": [{
         "type": "git",
-        "url": "https://github.com/oberhamsi/reinhardt.git"
+        "url": "https://github.com/orfon/reinhardt.git"
     }],
     "engines": {
         "ringojs": ">=0.9"

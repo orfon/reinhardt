@@ -1,5 +1,5 @@
 var assert = require("assert");
-var {Environment} = require('../lib/reinhardt');
+var {Reinhardt} = require('../lib/reinhardt');
 var {markSafe} = require('../lib/utils');
 
 // a fake tag module
@@ -27,11 +27,10 @@ var echoTagModule = (function() {
 
 exports.testEnv = function() {
 
-	var templates = new Environment({
+	var templates = new Reinhardt({
 		debug: true,
 		foo: 'bar'
 	});
-	
 	assert.isTrue(templates.DEBUG);
 	// other options are put into Environment.config
 	assert.isUndefined(templates.foo);
@@ -42,7 +41,7 @@ exports.testEnvConfig = function() {
 	// the {% echofoo %} tag must output
 	// the "foo" property of the environment config
 
-	var templates = new Environment({
+	var templates = new Reinhardt({
 		loader: module.resolve('./envtest/'),
 		tags: echoTagModule,
 		debug: false,
@@ -57,7 +56,7 @@ exports.testEnvConfig = function() {
 	assert.equal(t.render(), 'Master: bar\n\nChild: bar\n\n\n\n\t\n\t\tbar\n\t\n');
 
 	// passing everything in as array should give same result
-	templates = new Environment({
+	templates = new Reinhardt({
 		loader: [module.resolve('./envtest/')],
 		tags: [echoTagModule],
 		debug: true,

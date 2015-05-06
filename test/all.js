@@ -1,5 +1,6 @@
 exports.testBasic = require('./basic');
 exports.testContext = require('./context');
+exports.testEnvironment = require('./environment');
 exports.testFilterExpression = require('./filterexpression');
 exports.testFilters = require('./filters');
 exports.testLexer = require('./lexer');

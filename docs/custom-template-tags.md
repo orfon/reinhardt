@@ -300,7 +300,7 @@ Now your tag should begin to look like this:
         if (formatString[0] !== formatString.slice(-1) || ['"', "'"].indexOf(formatString[0]) < 0) {
           throw TemplateSyntaxError(tagName + " tag's argument should be in quotes")
         }
-        return FormatTimeNode(dateToBeFormatted, formatString.slice(1, -1));
+        return new FormatTimeNode(dateToBeFormatted, formatString.slice(1, -1));
     }
 
 

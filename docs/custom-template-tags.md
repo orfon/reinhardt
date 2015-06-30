@@ -315,7 +315,8 @@ for example:
 
     var {Variable} = require("reinhardt/variable");
     var FormatTimeNode = function(dateToBeFormatted, formatString) {
-      this.dateToBeFormatted = new Variable(dateToBeFormatted, formatString)
+      this.dateToBeFormatted = new Variable(dateToBeFormatted);
+      this.formatString = formatString;
       return this;
     }
     FormatTimeNode.prototype.render = function(context) {

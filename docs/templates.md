@@ -102,7 +102,9 @@ bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
 variable.
 
 Filter arguments that contain spaces must be quoted; for example, to join a
-list with commas and spaced you'd use ``{{ list|join:", " }}``.
+list with commas and spaced you'd use ``{{ list|join:", " }}``. It's not possible
+to pass multiple arguments to a filter. If you need multiple arguments, provide
+the logic in a custom tag or pass them as a single comma-separated string.
 
 Reinhardt provides about thirty built-in template filters. You can read all about
 them in the [built-in filter reference](filters.md). To give you a taste of what's

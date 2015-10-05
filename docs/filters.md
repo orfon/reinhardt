@@ -2,6 +2,7 @@ Built-in template filters
 ==================================
 
 This document describes Reinhardt's built-in template filters.
+A filter is a simple function that accepts a value, an optional argument, and returns an output.
 
 **List of built in filters**
 

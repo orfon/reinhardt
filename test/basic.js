@@ -1015,7 +1015,7 @@ exports.testBasic = function() {
                      );
                } else {
                      var template = env.getTemplate(key);
-                     assert.strictEqual(template.render(testContext, testTemplate), testSetup.result);
+                     assert.strictEqual(template.render(testContext, testTemplate), testSetup.result, key);
                }
             })
       }// end for tests

@@ -85,7 +85,7 @@ exports.testOrigin = function() {
       });
 
       var template = env.getTemplate('test.html');
-      assert.equal(template.origin.loadName, 'test.html');
+      assert.equal(template.origin.templateName, 'test.html');
    });
 }
 

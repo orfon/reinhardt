@@ -973,14 +973,13 @@ exports.testBasic = function() {
 
       for (var key in tests) {
             var test = tests[key];
-            var testTemplate = test[0];
-            var testContext = new Context(test[1]);
+            var testContext = test[1];
             var normalStringResult = test[2];
             var invalidStringResult = test[2];
             if (test[2] instanceof Array) {
                normalStringResult = test[2][0];
                invalidStringResult = test[2][1];
-            };
+            }
             var stringIfInvalid = 'INVALID';
             if (invalidStringResult instanceof Array) {
                stringIfInvalid = invalidStringResult[0];
@@ -1015,7 +1014,7 @@ exports.testBasic = function() {
                      );
                } else {
                      var template = env.getTemplate(key);
-                     assert.strictEqual(template.render(testContext, testTemplate), testSetup.result, key);
+                     assert.strictEqual(template.render(testContext), testSetup.result, key);
                }
             })
       }// end for tests

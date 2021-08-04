@@ -5,9 +5,8 @@ var {Template} = require('../lib/template');
 exports.testIfchangedRenderedTwice = function() {
    var template = new Template('{% ifchanged %}{{ gen.next }}{% endifchanged %}')
    function gen() {
-      for (var i = 1; i<10;i++) {
-         yield ("iteration no " + i)
-      }
+      let i = 1;
+      return {"next": () => "iteration no " + i++};
    }
    var output = template.render({
       gen: gen()

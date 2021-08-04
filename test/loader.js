@@ -78,29 +78,20 @@ exports.testCacheLoaderCaching = function() {
 }
 
 exports.testOrigin = function() {
-   var env = new Environment({
-      loader: [module.resolve("./templatedir/bar/")],
-      debug: true
-   });
+   [true, false].forEach(debug => {
+      var env = new Environment({
+         loader: [module.resolve("./templatedir/bar/")],
+         debug: debug
+      });
 
-   var template = env.getTemplate('test.html');
-   assert.equal(template.origin.loadName, 'test.html');
-   assert.equal(template.origin.dirs.length, 1);
+      var template = env.getTemplate('test.html');
+      assert.equal(template.origin.templateName, 'test.html');
+   });
 }
 
 exports.testStringOrigin = function() {
    var t = new Template('string template');
    assert.equal(t.origin.source, 'string template');
-}
-
-exports.testDebugFalseOrigin = function() {
-   var env = new Environment({
-      loader: [module.resolve("./templatedir/bar/")],
-      debug: false
-   });
-
-   var template = env.getTemplate('test.html');
-   assert.isUndefined(template.origin);
 }
 
 //start the test runner if we're called directly from command line

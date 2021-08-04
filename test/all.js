@@ -1,6 +1,7 @@
 exports.testBasic = require('./basic');
 exports.testContext = require('./context');
 exports.testEnvironment = require('./environment');
+exports.testRecursive = require('./recursive');
 exports.testFilterExpression = require('./filterexpression');
 exports.testFilters = require('./filters');
 exports.testLexer = require('./lexer');

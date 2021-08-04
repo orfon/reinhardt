@@ -18,8 +18,17 @@ SafeClass.prototype.toString = function() {
     return markSafe('you &gt; me');
 }
 
-exports.testFilters = function() {
 
+var DEFAULT_LOCALE = java.util.Locale.getDefault();
+exports.setUp = function() {
+    java.util.Locale.setDefault(new java.util.Locale("en", "US"));
+};
+
+exports.tearDown = function() {
+    java.util.Locale.setDefault(DEFAULT_LOCALE);
+};
+
+exports.testFilters = function() {
     // 'template_name': ['template contents', 'context dict',
     //                   'expected string output' or Exception class)
     var tests = {

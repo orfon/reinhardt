@@ -289,8 +289,7 @@ exports.testBasic = function() {
             'for-tag-empty01': ["{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"],
             'for-tag-empty02': ["{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"],
             'for-tag-empty03': ["{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"],
-            // bug #5
-            //'for-tag-filter-ws': ["{% for x in ''|add:'a b c' %}{{ x }}{% endfor %}", {}, 'a b c'],
+            'for-tag-filter-ws': ["{% for x in ''|add:'a b c' %}{{ x }}{% endfor %}", {}, 'a b c'],
 
             //FILTERS ###########################################################
 
@@ -343,15 +342,14 @@ exports.testBasic = function() {
 
             //Escaped backslash in argument
             // FIXME i don't understand - why should it return 'foo\ba'?
-            // filter-syntax15': ['{{ var|defaultifnull:"foo\bar" }}', {"var": null}, 'foo\ba'],
+            // 'filter-syntax15': ['{{ var|defaultifnull:"foo\bar" }}', {"var": null}, 'foo\ba'],
 
             //Escaped backslash using known escape char
             // FIXME regex doesn't work for this case
-            // filter-syntax16': ['{{ var|defaultifnull:"foo\now" }}', {"var": null}, 'foo\now'],
+            // 'filter-syntax16': ['{{ var|defaultifnull:"foo\now" }}', {"var": null}, 'foo\now'],
 
             //Empty strings can be passed as arguments to filters
-            // FIXME we always return 'INVALID'
-            // filter-syntax17': ['{{ var|join:"" }}', {'va': ['a', 'b', 'c']}, 'abc'],
+            'filter-syntax17': ['{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'],
 
             //Make sure that any unicode strings are converted to bytestrings
             //in the final output.
@@ -972,15 +970,15 @@ exports.testBasic = function() {
       };
 
       for (var key in tests) {
+            // console.log("-------", key);
             var test = tests[key];
-            var testTemplate = test[0];
-            var testContext = new Context(test[1]);
+            var testContext = test[1];
             var normalStringResult = test[2];
             var invalidStringResult = test[2];
             if (test[2] instanceof Array) {
                normalStringResult = test[2][0];
                invalidStringResult = test[2][1];
-            };
+            }
             var stringIfInvalid = 'INVALID';
             if (invalidStringResult instanceof Array) {
                stringIfInvalid = invalidStringResult[0];
@@ -1015,7 +1013,7 @@ exports.testBasic = function() {
                      );
                } else {
                      var template = env.getTemplate(key);
-                     assert.strictEqual(template.render(testContext, testTemplate), testSetup.result);
+                     assert.strictEqual(template.render(testContext), testSetup.result, key);
                }
             })
       }// end for tests
